@@ -1,0 +1,29 @@
+{
+  "_GHI_CHU": "Cấu hình Zalo Mini App cho Bunbun Burger. Các trường có dấu << >> cần dev điền sau khi tạo Mini App trên developers.zalo.me. Tham khảo schema mới nhất tại https://mini.zalo.me/documents.",
+  "app": {
+    "title": "Bunbun Burger",
+    "headerColor": "#FF5A1F",
+    "textColor": "white",
+    "statusBarType": "transparent",
+    "actionBarHidden": false,
+    "leftButton": "back",
+    "hideAndroidBottomNavigationBar": true,
+    "hideIOSSafeAreaBottom": false
+  },
+  "listCSS": [],
+  "listSyncJS": [],
+  "listAsyncJS": [],
+  "pages": {
+    "home": { "title": "Bunbun Burger" }
+  },
+  "oaIDtoOpenChat": "<<OA_ID_BUNBUN>>",
+  "template": {
+    "name": "zaui-food",
+    "oaID": "<<OA_ID_BUNBUN>>"
+  },
+  "permissions": [
+    "scope.userInfo",
+    "scope.userPhonenumber",
+    "scope.userLocation"
+  ]
+}

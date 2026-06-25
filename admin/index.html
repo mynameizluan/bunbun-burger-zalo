@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bunbun Burger · Quản lý thực đơn</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--orange:#FF5A1F;--orange-deep:#E8430C;--ink:#1B1613;--soft:#7C7268;--line:#ECE5DB;--cream:#FBF7F1;--green:#1F9E55;--gold:#E0A23C;--maroon:#9A1B1B;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Be Vietnam Pro',system-ui,sans-serif;background:var(--cream);color:var(--ink);}
+.wrap{max-width:920px;margin:0 auto;padding:18px 16px 80px;}
+h1{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;margin:0;letter-spacing:-.02em;}
+.sub{color:var(--soft);font-size:13px;margin:2px 0 16px;}
+.nav{display:flex;gap:8px;margin-bottom:14px;}
+.nav a{font-size:13px;font-weight:600;text-decoration:none;color:var(--soft);border:1px solid var(--line);background:#fff;padding:7px 13px;border-radius:9px;}
+.nav a.on{color:#fff;background:var(--orange);border-color:var(--orange);}
+.bar{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:16px;box-shadow:0 6px 20px rgba(27,22,19,.05);}
+.bar h3{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--soft);}
+.row2{display:flex;gap:10px;flex-wrap:wrap;}
+label{font-size:12px;color:var(--soft);display:block;margin:0 0 3px;}
+input,select{font-family:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);width:100%;}
+input:focus,select:focus{outline:none;border-color:var(--orange);}
+.fld{flex:1;min-width:180px;}
+.btn{font-family:inherit;font-weight:600;font-size:14px;border:none;border-radius:10px;padding:10px 16px;cursor:pointer;background:var(--orange);color:#fff;}
+.btn:hover{background:var(--orange-deep);}
+.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink);}
+.btn.sm{padding:6px 11px;font-size:12.5px;}
+.btn.danger{background:#fff;border:1px solid #eccfcf;color:var(--maroon);}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
+.spacer{flex:1;}
+.grp{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:0 6px 20px rgba(27,22,19,.05);}
+.grphead{display:flex;gap:10px;align-items:flex-end;margin-bottom:10px;}
+.grphead .icon{width:64px;flex:none;}
+.item-wrap{border-top:1px dashed var(--line);padding:9px 0;}
+.item{display:grid;grid-template-columns:64px 1fr 1fr 110px 70px 130px 36px;gap:8px;align-items:center;}
+.photo-row{margin-top:7px;display:flex;align-items:center;gap:8px;}
+.photo-row .lbl{display:inline;font-size:12px;color:var(--soft);white-space:nowrap;}
+.photo-row input{font-size:12.5px;padding:7px 10px;}
+.item .lbl{display:none;}
+.chk{display:flex;align-items:center;gap:6px;font-size:13px;}
+.chk input{width:auto;}
+.status-soldout{color:var(--maroon);font-weight:600;}
+.status-low{color:var(--gold);font-weight:600;}
+.x{background:#fff;border:1px solid var(--line);border-radius:8px;width:34px;height:34px;cursor:pointer;color:var(--maroon);font-size:16px;}
+.muted{color:var(--soft);font-size:12.5px;}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;
+  padding:11px 18px;border-radius:12px;font-size:13.5px;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:90%;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.err{background:var(--maroon);}
+.savebar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 16px;display:flex;gap:12px;align-items:center;justify-content:center;}
+.savebar .info{font-size:12.5px;color:var(--soft);}
+@media(max-width:720px){
+  .item{grid-template-columns:1fr 1fr;}
+  .item .lbl{display:block;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Bunbun Burger — Quản lý thực đơn</h1>
+  <div class="sub">Sửa giá, thêm/xoá món, đánh dấu <b>Tạm hết</b> — lưu thẳng lên Supabase, app cập nhật trong vài phút. Không cần API iPOS.</div>
+
+  <div class="nav">
+    <a href="index.html" class="on">Thực đơn</a>
+    <a href="members.html">Hội viên &amp; điểm</a>
+  </div>
+
+  <div class="bar">
+    <h3>Kết nối</h3>
+    <div class="row2">
+      <div class="fld"><label>API base (Supabase Functions)</label><input id="cfg-base" placeholder="https://<ref>.functions.supabase.co"></div>
+      <div class="fld"><label>Admin token</label><input id="cfg-token" type="password" placeholder="ADMIN_TOKEN trong .env"></div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn ghost" onclick="saveCfg()">Lưu cấu hình</button>
+      <button class="btn ghost" onclick="loadCurrent()">Tải menu hiện tại</button>
+      <span class="muted" id="conn-state" style="align-self:center"></span>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn ghost" onclick="loadSeed()">Nạp menu mẫu Bunbun (39 món)</button>
+    <button class="btn ghost" onclick="addGroup()">+ Thêm nhóm</button>
+    <span class="spacer"></span>
+    <span class="muted" id="count"></span>
+  </div>
+
+  <div id="groups"></div>
+
+  <div style="text-align:center;margin-top:8px"><button class="btn ghost" onclick="addGroup()">+ Thêm nhóm</button></div>
+</div>
+
+<div class="savebar">
+  <span class="info" id="save-info">Phiên bản hiện tại: —</span>
+  <button class="btn" onclick="publish()">Lưu lên Supabase</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ====== Menu mẫu (sinh từ app, 39 món) — dùng khi bắt đầu từ con số 0 ====== */
+const SEED = [{"cat":"Burger","icon":"🍔","items":[{"id":"b1","nm":"Burger Bò Xốt BBQ","ds":"Beef burger, BBQ sauce · +trứng/phô mai 7K","pr":42000,"hot":true},{"id":"b2","nm":"Burger Tôm Xốt Cay Đặc Biệt","ds":"Shrimp burger, special spicy sauce","pr":42000,"hot":true},{"id":"b3","nm":"Burger Tôm Xốt Mayo","ds":"Shrimp burger, mayo sauce","pr":42000,"hot":false},{"id":"b4","nm":"Burger Gà Nướng Teriyaki","ds":"Teriyaki grilled chicken burger","pr":39000,"hot":false},{"id":"b5","nm":"Burger Gà Rán Xốt Cay","ds":"Fried chicken burger, special spicy sauce","pr":39000,"hot":true},{"id":"b6","nm":"Burger Gà Rán Xốt Mayo","ds":"Fried chicken burger, mayo sauce","pr":39000,"hot":false}]},{"cat":"Mini Burger","icon":"🍔","items":[{"id":"mb1","nm":"Burger Mini Gà Nhân Phô Mai Chảy","ds":"'Lava' chicken mini burger","pr":22000,"hot":false},{"id":"mb2","nm":"Burger Mini Gà Teriyaki","ds":"Teriyaki chicken mini burger","pr":22000,"hot":false},{"id":"mb3","nm":"Combo Mini Teriyaki x Phô Mai Chảy","ds":"'Lava' x Teriyaki mini combo","pr":42000,"hot":false}]},{"cat":"Món kèm","icon":"🍟","items":[{"id":"s1","nm":"Khoai Tây Gà Xốt Cay","ds":"French fries & spicy chicken","pr":35000,"hot":true},{"id":"s2","nm":"Khoai Tây Bò Băm Teriyaki","ds":"Fries & minced beef teriyaki","pr":35000,"hot":false},{"id":"s3","nm":"Khoai Tây Chiên","ds":"French fries · +xốt phô mai 5K","pr":20000,"hot":false},{"id":"s4","nm":"Gà Viên","ds":"Chicken balls · +bột ớt Tứ Xuyên 5K","pr":35000,"hot":false},{"id":"s5","nm":"Tôm Viên","ds":"Shrimp balls · +bột ớt Tứ Xuyên 5K","pr":45000,"hot":false}]},{"cat":"Topping","icon":"➕","items":[{"id":"t1","nm":"Bò Nướng","ds":"BBQ beef","pr":25000,"hot":false},{"id":"t2","nm":"Tôm Chiên","ds":"Fried shrimp","pr":25000,"hot":false},{"id":"t3","nm":"Gà Rán","ds":"Fried chicken","pr":20000,"hot":false},{"id":"t4","nm":"Gà Nướng","ds":"Grilled chicken","pr":20000,"hot":false},{"id":"t5","nm":"Thịt Xông Khói","ds":"Bacon","pr":25000,"hot":false}]},{"cat":"Salad","icon":"🥗","items":[{"id":"sl1","nm":"Salad Bắp Cải Xốt Mè Rang","ds":"Cabbage salad, sesame sauce","pr":25000,"hot":false},{"id":"sl2","nm":"Salad Bắp Cải Xốt Mù Tạt","ds":"Cabbage salad, mustard sauce","pr":25000,"hot":false}]},{"cat":"Tráng miệng","icon":"🍮","items":[{"id":"ds1","nm":"Custard Trứng Phô Mai","ds":"Egg & cheese custard","pr":25000,"hot":false},{"id":"ds2","nm":"Tart Trứng (2 cái)","ds":"Egg tart - 2 pcs","pr":25000,"hot":false},{"id":"ds3","nm":"Tart Trứng (4 cái)","ds":"Egg tart - 4 pcs","pr":49000,"hot":false},{"id":"ds4","nm":"Tart Trứng Trái Cây","ds":"Fruit tart","pr":59000,"hot":false},{"id":"ds5","nm":"Bánh Hạt Dẻ (3 cái)","ds":"Chestnut custard - 3 pcs","pr":22000,"hot":false},{"id":"ds6","nm":"Bánh Hạt Dẻ (5 cái)","ds":"Chestnut custard - 5 pcs","pr":35000,"hot":false}]},{"cat":"Cà phê","icon":"☕","items":[{"id":"cf1","nm":"Tiramisu Latte","ds":"Tiramisu latte","pr":39000,"hot":false},{"id":"cf2","nm":"Cafe Bơ Pháp","ds":"French butter coffee","pr":39000,"hot":false},{"id":"cf3","nm":"Sữa Tươi Cafe","ds":"Fresh milk coffee","pr":29000,"hot":false},{"id":"cf4","nm":"Cafe Sữa Sài Gòn","ds":"Saigon milk coffee","pr":29000,"hot":false}]},{"cat":"Nước uống","icon":"🥤","items":[{"id":"n1","nm":"Coca Cola","ds":"Coca Cola","pr":19000,"hot":false},{"id":"n2","nm":"Sprite","ds":"Sprite","pr":19000,"hot":false},{"id":"n3","nm":"Trà Chanh","ds":"Lemon tea","pr":19000,"hot":false},{"id":"n4","nm":"Milo","ds":"Milo đá xay","pr":25000,"hot":false},{"id":"n5","nm":"Chocolate Muối Biển","ds":"Sea salt chocolate","pr":39000,"hot":false},{"id":"n6","nm":"Nước Dứa Tắc","ds":"Pineapple & kumquat","pr":29000,"hot":false},{"id":"n7","nm":"Soda Vải","ds":"Lychee soda","pr":29000,"hot":false},{"id":"n8","nm":"Soda Dâu Tây","ds":"Strawberry soda","pr":29000,"hot":false}]}];
+
+const $ = s => document.querySelector(s);
+let model = [];   // [{cat, icon, items:[{id,nm,ds,pr,hot,status}]}]
+
+/* ---- cấu hình lưu localStorage ---- */
+function cfg(){ return { base:(localStorage.getItem('bb_admin_base')||'').replace(/\/$/,''), token:localStorage.getItem('bb_admin_token')||'' }; }
+function saveCfg(){
+  localStorage.setItem('bb_admin_base', $('#cfg-base').value.trim());
+  localStorage.setItem('bb_admin_token', $('#cfg-token').value.trim());
+  toast('Đã lưu cấu hình trên máy này');
+}
+function restoreCfg(){ const c=cfg(); $('#cfg-base').value=c.base; $('#cfg-token').value=c.token; }
+
+function toast(msg, err){ const t=$('#toast'); t.textContent=msg; t.className='toast show'+(err?' err':''); clearTimeout(t._t); t._t=setTimeout(()=>t.className='toast',2600); }
+
+/* ---- nạp dữ liệu ---- */
+function normItems(items, avail){ return items.map(it=>({ id:it.id, nm:it.nm, ds:it.ds||'', pr:Number(it.pr)||0, hot:!!it.hot, photo:it.photo||'', status:(avail&&avail[it.id])||'available' })); }
+function loadSeed(){
+  model = SEED.map(g=>({ cat:g.cat, icon:g.icon||'🍽️', items:normItems(g.items) }));
+  render(); toast('Đã nạp menu mẫu — chỉnh rồi bấm “Lưu lên Supabase”');
+}
+async function loadCurrent(){
+  const c=cfg(); if(!c.base||!c.token){ toast('Điền API base + admin token trước', true); return; }
+  $('#conn-state').textContent='Đang tải…';
+  try{
+    const r=await fetch(c.base+'/menu-admin',{ headers:{'x-admin-token':c.token} });
+    if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error(e.error||('HTTP '+r.status)); }
+    const j=await r.json();
+    if(!j.groups||!j.groups.length){ $('#conn-state').textContent='Chưa có menu trên server — bấm “Nạp menu mẫu”.'; model=[]; render(); return; }
+    model = j.groups.map(g=>({ cat:g.cat, icon:g.icon||'🍽️', items:normItems(g.items, j.availability) }));
+    $('#save-info').textContent='Phiên bản hiện tại: '+(j.version||'—')+(j.updatedAt?(' · '+new Date(j.updatedAt).toLocaleString('vi-VN')):'');
+    $('#conn-state').textContent='Đã tải menu hiện tại ✓';
+    render(); toast('Đã tải menu hiện tại từ Supabase');
+  }catch(e){ $('#conn-state').textContent=''; toast('Lỗi tải: '+e.message, true); }
+}
+
+/* ---- chỉnh model ---- */
+function setField(gi, ii, key, val){ if(ii<0) model[gi][key]=val; else model[gi].items[ii][key]=val; }
+function addItem(gi){ model[gi].items.push({ id:'new'+Date.now().toString(36), nm:'', ds:'', pr:0, hot:false, photo:'', status:'available' }); render(); }
+function delItem(gi, ii){ model[gi].items.splice(ii,1); render(); }
+function addGroup(){ model.push({ cat:'Nhóm mới', icon:'🍽️', items:[] }); render(); toast('Đã thêm nhóm'); }
+function delGroup(gi){ if(confirm('Xoá cả nhóm “'+model[gi].cat+'”?')){ model.splice(gi,1); render(); } }
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function render(){
+  const totalItems = model.reduce((s,g)=>s+g.items.length,0);
+  $('#count').textContent = model.length+' nhóm · '+totalItems+' món';
+  $('#groups').innerHTML = model.map((g,gi)=>`
+    <div class="grp">
+      <div class="grphead">
+        <div class="icon"><label>Icon</label><input value="${esc(g.icon)}" oninput="setField(${gi},-1,'icon',this.value)"></div>
+        <div class="fld"><label>Tên nhóm</label><input value="${esc(g.cat)}" oninput="setField(${gi},-1,'cat',this.value)"></div>
+        <button class="btn danger sm" onclick="delGroup(${gi})">Xoá nhóm</button>
+      </div>
+      ${g.items.map((it,ii)=>`
+        <div class="item-wrap">
+        <div class="item">
+          <div><span class="lbl">Mã</span><input value="${esc(it.id)}" oninput="setField(${gi},${ii},'id',this.value)"></div>
+          <div><span class="lbl">Tên món</span><input value="${esc(it.nm)}" oninput="setField(${gi},${ii},'nm',this.value)"></div>
+          <div><span class="lbl">Mô tả</span><input value="${esc(it.ds)}" oninput="setField(${gi},${ii},'ds',this.value)"></div>
+          <div><span class="lbl">Giá (đ)</span><input type="number" min="0" step="1000" value="${it.pr}" oninput="setField(${gi},${ii},'pr',Number(this.value)||0)"></div>
+          <div><label class="chk"><input type="checkbox" ${it.hot?'checked':''} onchange="setField(${gi},${ii},'hot',this.checked)">Best</label></div>
+          <div><span class="lbl">Trạng thái</span>
+            <select class="status-${it.status}" onchange="setField(${gi},${ii},'status',this.value);render()">
+              <option value="available" ${it.status==='available'?'selected':''}>Còn hàng</option>
+              <option value="low" ${it.status==='low'?'selected':''}>Sắp hết</option>
+              <option value="soldout" ${it.status==='soldout'?'selected':''}>Tạm hết</option>
+            </select></div>
+          <button class="x" title="Xoá món" onclick="delItem(${gi},${ii})">✕</button>
+        </div>
+        <div class="photo-row"><span class="lbl">Ảnh</span><input value="${esc(it.photo)}" placeholder="Link ảnh món (https://… — để trống sẽ dùng minh hoạ)" oninput="setField(${gi},${ii},'photo',this.value)"></div>
+        </div>`).join('')}
+      <div style="margin-top:10px"><button class="btn ghost sm" onclick="addItem(${gi})">+ Thêm món</button></div>
+    </div>`).join('') || '<div class="muted" style="text-align:center;padding:30px">Chưa có nhóm nào. Bấm “Nạp menu mẫu Bunbun” hoặc “Thêm nhóm”.</div>';
+}
+
+/* ---- validate + gửi lên Supabase ---- */
+function buildPayload(){
+  const groups = model.map(g=>({ cat:g.cat.trim(), icon:g.icon, items:g.items.map(it=>{ const o={ id:it.id.trim(), nm:it.nm.trim(), ds:it.ds, pr:Number(it.pr)||0, hot:!!it.hot }; if(it.photo&&it.photo.trim()) o.photo=it.photo.trim(); return o; }) }));
+  const availability = {};
+  model.forEach(g=>g.items.forEach(it=>{ if(it.status&&it.status!=='available') availability[it.id.trim()]=it.status; else availability[it.id.trim()]='available'; }));
+  return { groups, availability };
+}
+function validate(){
+  const ids=new Set();
+  for(const g of model){
+    if(!g.cat.trim()) return 'Có nhóm chưa đặt tên';
+    for(const it of g.items){
+      if(!it.id.trim()) return 'Có món thiếu mã (id)';
+      if(!it.nm.trim()) return 'Có món thiếu tên';
+      if(ids.has(it.id.trim())) return 'Trùng mã món: '+it.id;
+      ids.add(it.id.trim());
+    }
+  }
+  if(!model.some(g=>g.items.length)) return 'Menu rỗng';
+  return null;
+}
+async function publish(){
+  const c=cfg(); if(!c.base||!c.token){ toast('Điền API base + admin token trước', true); return; }
+  const err=validate(); if(err){ toast(err, true); return; }
+  try{
+    const r=await fetch(c.base+'/menu-admin',{ method:'POST', headers:{'Content-Type':'application/json','x-admin-token':c.token}, body:JSON.stringify(buildPayload()) });
+    const j=await r.json();
+    if(!r.ok){ throw new Error(j.error||('HTTP '+r.status)); }
+    $('#save-info').textContent='Phiên bản hiện tại: '+j.version+' · vừa lưu '+new Date().toLocaleTimeString('vi-VN');
+    toast('Đã lưu! '+j.groups+' nhóm — app sẽ cập nhật trong vài phút.');
+  }catch(e){ toast('Lỗi lưu: '+e.message, true); }
+}
+
+/* ---- init ---- */
+restoreCfg();
+render();
+</script>
+</body>
+</html>

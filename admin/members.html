@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bunbun Burger · Hội viên & điểm</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--orange:#FF5A1F;--orange-deep:#E8430C;--ink:#1B1613;--soft:#7C7268;--line:#ECE5DB;--cream:#FBF7F1;--green:#1F9E55;--gold:#E0A23C;--maroon:#9A1B1B;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Be Vietnam Pro',system-ui,sans-serif;background:var(--cream);color:var(--ink);}
+.wrap{max-width:980px;margin:0 auto;padding:18px 16px 40px;}
+h1{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;margin:0;letter-spacing:-.02em;}
+.sub{color:var(--soft);font-size:13px;margin:2px 0 16px;}
+.nav{display:flex;gap:8px;margin-bottom:14px;}
+.nav a{font-size:13px;font-weight:600;text-decoration:none;color:var(--soft);border:1px solid var(--line);background:#fff;padding:7px 13px;border-radius:9px;}
+.nav a.on{color:#fff;background:var(--orange);border-color:var(--orange);}
+.bar{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:16px;box-shadow:0 6px 20px rgba(27,22,19,.05);}
+.bar h3{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--soft);}
+.row2{display:flex;gap:10px;flex-wrap:wrap;}
+label{font-size:12px;color:var(--soft);display:block;margin:0 0 3px;}
+input{font-family:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);width:100%;}
+input:focus{outline:none;border-color:var(--orange);}
+.fld{flex:1;min-width:180px;}
+.btn{font-family:inherit;font-weight:600;font-size:14px;border:none;border-radius:10px;padding:10px 16px;cursor:pointer;background:var(--orange);color:#fff;}
+.btn:hover{background:var(--orange-deep);}
+.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink);}
+.btn.sm{padding:6px 10px;font-size:12.5px;}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 6px 20px rgba(27,22,19,.05);}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--soft);background:#FCFAF7;}
+td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;}
+.tier{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;border:1px solid var(--line);}
+.t-Đồng{color:#9A6B3B;border-color:#e6d3bf;} .t-Bạc{color:#6b7280;border-color:#d9dce1;}
+.t-Vàng{color:#9a7400;border-color:#ecdc8f;} .t-KimCương{color:#0a7ea4;border-color:#bfe6f0;}
+.acts{display:flex;gap:6px;flex-wrap:wrap;}
+.muted{color:var(--soft);font-size:12.5px;}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:12px;font-size:13.5px;opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:90%;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.err{background:var(--maroon);}
+.scrim{position:fixed;inset:0;background:rgba(20,14,10,.5);opacity:0;pointer-events:none;transition:.2s;z-index:40;}
+.scrim.show{opacity:1;pointer-events:auto;}
+.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%);background:#fff;border-radius:16px;padding:18px;width:min(460px,92vw);max-height:80vh;overflow:auto;box-shadow:0 30px 70px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:.2s;z-index:50;}
+.modal.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%);}
+.modal h3{margin:0 0 10px;font-family:'Plus Jakarta Sans',sans-serif;}
+.tx{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px;}
+.tx .pos{color:var(--green);font-weight:600;} .tx .neg{color:var(--maroon);font-weight:600;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Bunbun Burger — Hội viên & điểm</h1>
+  <div class="sub">Xem điểm/hạng/tem của khách, cộng-trừ điểm và xác nhận đổi quà ngay tại quầy. Không cần iPOS CRM.</div>
+
+  <div class="nav">
+    <a href="index.html">Thực đơn</a>
+    <a href="members.html" class="on">Hội viên & điểm</a>
+  </div>
+
+  <div class="bar">
+    <h3>Kết nối</h3>
+    <div class="row2">
+      <div class="fld"><label>API base (Supabase Functions)</label><input id="cfg-base" placeholder="https://<ref>.functions.supabase.co"></div>
+      <div class="fld"><label>Admin token</label><input id="cfg-token" type="password" placeholder="ADMIN_TOKEN trong .env"></div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn ghost" onclick="saveCfg()">Lưu cấu hình</button>
+      <span class="muted" id="conn-state" style="align-self:center"></span>
+    </div>
+  </div>
+
+  <div class="bar">
+    <div class="row2" style="align-items:flex-end">
+      <div class="fld" style="flex:2"><label>Tìm theo số điện thoại</label><input id="q" placeholder="VD: 0799..." onkeydown="if(event.key==='Enter')loadMembers()"></div>
+      <button class="btn" onclick="loadMembers()">Tìm / Làm mới</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead><tr><th>SĐT</th><th>Tên</th><th style="text-align:right">Điểm</th><th>Hạng</th><th style="text-align:right">Tem</th><th>Tham gia</th><th>Thao tác</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="7" class="muted" style="text-align:center;padding:26px">Điền kết nối rồi bấm “Tìm / Làm mới”.</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" onclick="closeModal()"></div>
+<div class="modal" id="modal">
+  <h3 id="m-title">Lịch sử điểm</h3>
+  <div id="m-body"></div>
+  <div style="text-align:right;margin-top:12px"><button class="btn ghost" onclick="closeModal()">Đóng</button></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+let members = [];
+
+function cfg(){ return { base:(localStorage.getItem('bb_admin_base')||'').replace(/\/$/,''), token:localStorage.getItem('bb_admin_token')||'' }; }
+function saveCfg(){ localStorage.setItem('bb_admin_base',$('#cfg-base').value.trim()); localStorage.setItem('bb_admin_token',$('#cfg-token').value.trim()); toast('Đã lưu cấu hình'); }
+function restoreCfg(){ const c=cfg(); $('#cfg-base').value=c.base; $('#cfg-token').value=c.token; }
+function toast(m,err){ const t=$('#toast'); t.textContent=m; t.className='toast show'+(err?' err':''); clearTimeout(t._t); t._t=setTimeout(()=>t.className='toast',2600); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+function fmt(n){ return (Number(n)||0).toLocaleString('vi-VN'); }
+function dt(s){ return s? new Date(s).toLocaleDateString('vi-VN') : '—'; }
+
+async function api(path, opt){
+  const c=cfg(); if(!c.base||!c.token){ toast('Điền API base + admin token trước', true); throw new Error('no cfg'); }
+  opt=opt||{}; opt.headers=Object.assign({'x-admin-token':c.token}, opt.headers||{});
+  const r=await fetch(c.base+path, opt);
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error||('HTTP '+r.status));
+  return j;
+}
+
+async function loadMembers(){
+  $('#conn-state').textContent='Đang tải…';
+  try{
+    const q=$('#q').value.trim();
+    const j=await api('/members-admin'+(q?('?phone='+encodeURIComponent(q)):''));
+    members=j.members||[];
+    $('#conn-state').textContent='Đã tải '+members.length+' hội viên';
+    renderRows();
+  }catch(e){ $('#conn-state').textContent=''; toast('Lỗi: '+e.message, true); }
+}
+
+function renderRows(){
+  if(!members.length){ $('#rows').innerHTML='<tr><td colspan="7" class="muted" style="text-align:center;padding:26px">Chưa có hội viên nào khớp.</td></tr>'; return; }
+  $('#rows').innerHTML = members.map(m=>{
+    const tierCls='t-'+String(m.tier||'Đồng').replace(/\s/g,'');
+    return `<tr>
+      <td>${esc(m.phone)||'<span class="muted">—</span>'}</td>
+      <td>${esc(m.name)||'<span class="muted">—</span>'}</td>
+      <td class="num">${fmt(m.points)}</td>
+      <td><span class="tier ${tierCls}">${esc(m.tier||'Đồng')}</span></td>
+      <td class="num">${m.stamps||0}/10</td>
+      <td class="muted">${dt(m.created_at)}</td>
+      <td><div class="acts">
+        <button class="btn ghost sm" onclick="adjust('${m.id}')">Cộng/Trừ</button>
+        <button class="btn ghost sm" onclick="redeemStamp('${m.id}', ${m.stamps||0})">Đổi burger</button>
+        <button class="btn ghost sm" onclick="history('${m.id}')">Lịch sử</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+async function adjust(id){
+  const m=members.find(x=>x.id===id);
+  const raw=prompt('Cộng/Trừ điểm cho '+(m?.phone||'hội viên')+'\n(số dương = cộng, âm = trừ). VD: -300 để đổi quà 300 điểm:');
+  if(raw===null) return;
+  const delta=parseInt(raw,10);
+  if(!delta||Number.isNaN(delta)){ toast('Số điểm không hợp lệ', true); return; }
+  const note=prompt('Lý do (tuỳ chọn), VD: "Đổi voucher 20K":')||'';
+  try{
+    const j=await api('/members-admin',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action:'adjust',memberId:id,pointsDelta:delta,note}) });
+    toast('Đã cập nhật: '+fmt(j.points)+' điểm · hạng '+j.tier);
+    loadMembers();
+  }catch(e){ toast('Lỗi: '+e.message, true); }
+}
+
+async function redeemStamp(id, stamps){
+  if(stamps<10){ if(!confirm('Khách mới có '+stamps+'/10 tem. Vẫn reset tem (xác nhận đã tặng burger)?')) return; }
+  else { if(!confirm('Xác nhận khách đã đổi burger miễn phí? Sẽ reset 10 tem về 0.')) return; }
+  try{
+    await api('/members-admin',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action:'redeemStamp',memberId:id}) });
+    toast('Đã reset tem · ghi nhận đổi burger');
+    loadMembers();
+  }catch(e){ toast('Lỗi: '+e.message, true); }
+}
+
+async function history(id){
+  const m=members.find(x=>x.id===id);
+  $('#m-title').textContent='Lịch sử điểm · '+(m?.phone||'');
+  $('#m-body').innerHTML='<div class="muted">Đang tải…</div>';
+  openModal();
+  try{
+    const j=await api('/members-admin?txns='+encodeURIComponent(id));
+    const txns=j.txns||[];
+    $('#m-body').innerHTML = txns.length ? txns.map(t=>`
+      <div class="tx">
+        <span>${esc(t.note||t.txn_type)}${t.ref_order_no?(' · '+esc(t.ref_order_no)):''}<br><span class="muted">${new Date(t.created_at).toLocaleString('vi-VN')}</span></span>
+        <span class="${t.amount>=0?'pos':'neg'}">${t.amount>0?'+':''}${fmt(t.amount)}</span>
+      </div>`).join('') : '<div class="muted">Chưa có giao dịch điểm nào.</div>';
+  }catch(e){ $('#m-body').innerHTML='<div class="muted">Lỗi: '+esc(e.message)+'</div>'; }
+}
+function openModal(){ $('#scrim').classList.add('show'); $('#modal').classList.add('show'); }
+function closeModal(){ $('#scrim').classList.remove('show'); $('#modal').classList.remove('show'); }
+
+restoreCfg();
+if(cfg().base && cfg().token) loadMembers();
+</script>
+</body>
+</html>

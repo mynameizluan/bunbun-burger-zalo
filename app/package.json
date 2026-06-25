@@ -1,0 +1,18 @@
+{
+  "name": "bunbun-zalo-miniapp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Zalo Mini App cho Bunbun Burger — đặt món qua iPOS Web Order, tích điểm qua iPOS CRM, liên kết Zalo OA.",
+  "scripts": {
+    "start": "zmp start",
+    "deploy": "zmp deploy",
+    "login": "zmp login"
+  },
+  "dependencies": {
+    "zmp-sdk": "latest"
+  },
+  "devDependencies": {
+    "zmp-cli": "latest",
+    "vite": "^4.0.0"
+  }
+}
