@@ -24,8 +24,7 @@ import {
 
 /* -------------------- CẤU HÌNH BUNBUN (điền giá trị thật) ----------------- */
 export const CONFIG = {
-  // TODO[OA_ID]: điền ID Zalo OA đã xác thực (cũng cập nhật trong app-config.json)
-  OA_ID: "<<OA_ID_BUNBUN>>",
+  OA_ID: "1583148066946026012",   // Zalo OA Bunbun Burger (đã xác thực)
   IPOS_URL:
     "https://order.ipos.vn/menu?pos_parent=BRAND-QR4Q&pos_id=130726&source=DEFAULT",
   // TODO[GRAB_URL]: điền link gian hàng GrabFood thật của Bunbun

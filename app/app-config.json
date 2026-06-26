@@ -16,10 +16,10 @@
   "pages": {
     "home": { "title": "Bunbun Burger" }
   },
-  "oaIDtoOpenChat": "<<OA_ID_BUNBUN>>",
+  "oaIDtoOpenChat": "1583148066946026012",
   "template": {
     "name": "zaui-food",
-    "oaID": "<<OA_ID_BUNBUN>>"
+    "oaID": "1583148066946026012"
   },
   "permissions": [
     "scope.userInfo",
