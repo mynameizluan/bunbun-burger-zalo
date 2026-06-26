@@ -32,7 +32,7 @@ supabase secrets set --env-file ./backend/.env
 ```bash
 supabase functions deploy menu --no-verify-jwt
 supabase functions deploy availability --no-verify-jwt
-supabase functions deploy crm-points        # giữ verify-jwt nếu cần bảo vệ
+supabase functions deploy crm-points --no-verify-jwt  # app gọi không kèm JWT; vẫn an toàn nhờ phoneToken+accessToken Zalo
 supabase functions deploy menu-admin --no-verify-jwt    # admin tự quản menu/tồn-hết ($0)
 supabase functions deploy members-admin --no-verify-jwt # admin xem/cộng-trừ điểm hội viên ($0)
 supabase functions deploy sync-menu --no-verify-jwt     # TUỲ CHỌN: cron đồng bộ iPOS (Phase 2, trả phí)

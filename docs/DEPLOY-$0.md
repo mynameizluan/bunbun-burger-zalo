@@ -32,7 +32,7 @@ Ký hiệu: 🧑 = việc cần tài khoản/danh tính của bạn · 💻 = ch
    # đặt mỗi file backend/functions/<tên>.ts vào supabase/functions/<tên>/index.ts rồi:
    supabase functions deploy menu --no-verify-jwt
    supabase functions deploy availability --no-verify-jwt
-   supabase functions deploy crm-points
+   supabase functions deploy crm-points --no-verify-jwt
    supabase functions deploy menu-admin --no-verify-jwt
    supabase functions deploy members-admin --no-verify-jwt
    ```
