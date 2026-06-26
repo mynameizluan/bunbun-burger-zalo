@@ -19,8 +19,10 @@ Deno.serve(async (req) => {
   if (error || !data) return new Response(JSON.stringify({ error: "no menu" }), { status: 404, headers: CORS });
 
   const etag = `"v${data.version}"`;
-  // stale-while-revalidate: client dùng cache, tự làm mới nền; 304 nếu chưa đổi
-  if (req.headers.get("if-none-match") === etag) {
+  // stale-while-revalidate: client dùng cache, tự làm mới nền; 304 nếu chưa đổi.
+  // Bỏ tiền tố W/ (weak validator do proxy gzip thêm) trước khi so khớp.
+  const inm = (req.headers.get("if-none-match") ?? "").replace(/^W\//, "");
+  if (inm === etag) {
     return new Response(null, { status: 304, headers: { ...CORS, ETag: etag } });
   }
   return new Response(JSON.stringify({ version: data.version, updatedAt: data.updated_at, ...data.data }), {
