@@ -30,7 +30,7 @@ export const CONFIG = {
   GRAB_URL: "https://r.grab.com/g/6-20260626_145322_2FCABCFD42374B7490A3C8B3F233390E_MEXMPS-5-C7V1V4CBFFBKFA",   // GrabFood Bunbun Burger (CS Đặng Thái Thân)
   SHOPEE_URL: "https://shopeefood.vn/hue/bunbun-burger-39a-ben-nghe",
   // Endpoint backend của bạn (nếu Phase 2 nối iPOS CRM/Order API qua server riêng)
-  API_BASE: "<<HTTPS_BACKEND_BUNBUN>>",
+  API_BASE: "https://vmmjvkotttbxoyforxgh.functions.supabase.co",   // Supabase Edge Functions Bunbun
 };
 
 const inZalo = typeof getUserInfo === "function"; // false khi chạy thử trên trình duyệt
