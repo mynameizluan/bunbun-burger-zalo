@@ -27,8 +27,7 @@ export const CONFIG = {
   OA_ID: "1583148066946026012",   // Zalo OA Bunbun Burger (đã xác thực)
   IPOS_URL:
     "https://order.ipos.vn/menu?pos_parent=BRAND-QR4Q&pos_id=130726&source=DEFAULT",
-  // TODO[GRAB_URL]: điền link gian hàng GrabFood thật của Bunbun
-  GRAB_URL: "<<LINK_GIAN_HANG_GRABFOOD>>",
+  GRAB_URL: "https://r.grab.com/g/6-20260626_145322_2FCABCFD42374B7490A3C8B3F233390E_MEXMPS-5-C7V1V4CBFFBKFA",   // GrabFood Bunbun Burger (CS Đặng Thái Thân)
   SHOPEE_URL: "https://shopeefood.vn/hue/bunbun-burger-39a-ben-nghe",
   // Endpoint backend của bạn (nếu Phase 2 nối iPOS CRM/Order API qua server riêng)
   API_BASE: "<<HTTPS_BACKEND_BUNBUN>>",
