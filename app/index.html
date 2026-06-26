@@ -7,7 +7,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-<style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* CSS + HTML do JS chèn (Zalo không phục vụ index.html, chỉ chạy inline.js) */
+var __CSS=`
 :root{
   --orange:#FF5A1F;
   --orange-deep:#E8430C;
@@ -382,10 +387,8 @@ body{background:var(--cream);}
 .lowlbl{display:inline-block;font-size:8.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
   color:var(--gold);border:1px solid var(--gold);border-radius:5px;padding:1px 6px;margin-left:6px;vertical-align:middle;}
 .addbtn[disabled],.add[disabled]{opacity:.35;pointer-events:none;}
-</style>
-</head>
-<body>
-<div id="app">
+`;
+var __TPL=`
 
   <!-- Zalo mini-app control bar -->
   <div class="zbar">
@@ -409,17 +412,17 @@ body{background:var(--cream);}
         <span class="tag">Món tủ · Made in Huế</span>
         <h2>Burger Tôm<br>Xốt Cay Đặc Biệt</h2>
         <p>Tôm giòn rụm, xốt cay đặc trưng Bunbun. Burger chỉ từ 39K.</p>
-        <button class="cta" onclick="go('menu')">Đặt ngay →</button>
+        <button class="cta" data-a="go" data-v="menu">Đặt ngay →</button>
       </div>
 
       <div class="quick">
-        <button class="q" onclick="go('menu')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9c0-3 3.6-5 8-5s8 2 8 5"/><path d="M8.5 6.6h.01M12 6h.01M15.4 6.7h.01"/><path d="M3.5 12.4h17"/><path d="M4.2 15.8h15.6c0 2.4-2 4.2-4.2 4.2H8.4c-2.2 0-4.2-1.8-4.2-4.2z"/></svg></div>Đặt món</button>
-        <button class="q" onclick="go('loyalty')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M3 9.5h18"/><path d="M16.5 13l.7 1.5 1.6.2-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6-1.2-1.1 1.6-.2z"/><path d="M6 14.5h4"/></svg></div>Tích điểm</button>
-        <button class="q" onclick="go('loyalty')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11h15v7.5a1 1 0 0 1-1 1H5.5a1 1 0 0 1-1-1z"/><path d="M3.5 7.5h17V11h-17z"/><path d="M12 7.5v12"/><path d="M12 7.5C9.5 7.5 7.8 6.2 8.6 4.7 9.3 3.5 12 4.8 12 7.5c0-2.7 2.7-4 3.4-2.8.8 1.5-.9 2.8-3.4 2.8"/></svg></div>Đổi quà</button>
-        <button class="q" onclick="toast('39A Bến Nghé, TP. Huế')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c4.5-4.2 7-7.4 7-11a7 7 0 0 0-14 0c0 3.6 2.5 6.8 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg></div>Chi nhánh</button>
+        <button class="q" data-a="go" data-v="menu"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9c0-3 3.6-5 8-5s8 2 8 5"/><path d="M8.5 6.6h.01M12 6h.01M15.4 6.7h.01"/><path d="M3.5 12.4h17"/><path d="M4.2 15.8h15.6c0 2.4-2 4.2-4.2 4.2H8.4c-2.2 0-4.2-1.8-4.2-4.2z"/></svg></div>Đặt món</button>
+        <button class="q" data-a="go" data-v="loyalty"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M3 9.5h18"/><path d="M16.5 13l.7 1.5 1.6.2-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6-1.2-1.1 1.6-.2z"/><path d="M6 14.5h4"/></svg></div>Tích điểm</button>
+        <button class="q" data-a="go" data-v="loyalty"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11h15v7.5a1 1 0 0 1-1 1H5.5a1 1 0 0 1-1-1z"/><path d="M3.5 7.5h17V11h-17z"/><path d="M12 7.5v12"/><path d="M12 7.5C9.5 7.5 7.8 6.2 8.6 4.7 9.3 3.5 12 4.8 12 7.5c0-2.7 2.7-4 3.4-2.8.8 1.5-.9 2.8-3.4 2.8"/></svg></div>Đổi quà</button>
+        <button class="q" data-a="toastmsg" data-v="39A Bến Nghé, TP. Huế"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c4.5-4.2 7-7.4 7-11a7 7 0 0 0-14 0c0 3.6 2.5 6.8 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg></div>Chi nhánh</button>
       </div>
 
-      <div class="minicard" onclick="go('loyalty')">
+      <div class="minicard" data-a="go" data-v="loyalty">
         <div>
           <div class="pts" id="home-pts">0</div>
           <div class="lbl">điểm Bunbun của bạn</div>
@@ -427,10 +430,10 @@ body{background:var(--cream);}
         <div class="ring">Hạng <b id="home-rank">Đồng</b><br>Xem thẻ thành viên →</div>
       </div>
 
-      <div class="sechead"><h3>Bán chạy nhất</h3><a onclick="go('menu')">Tất cả</a></div>
+      <div class="sechead"><h3>Bán chạy nhất</h3><a data-a="go" data-v="menu">Tất cả</a></div>
       <div class="hscroll" id="bestsellers"></div>
 
-      <div class="sechead"><h3>Món thêm &amp; đồ uống</h3><a onclick="go('menu')">Xem thêm</a></div>
+      <div class="sechead"><h3>Món thêm &amp; đồ uống</h3><a data-a="go" data-v="menu">Xem thêm</a></div>
       <div class="hscroll" id="sides"></div>
       <div style="height:90px"></div>
     </section>
@@ -481,18 +484,18 @@ body{background:var(--cream);}
       <div class="pad"><div class="h1">Tài khoản</div></div>
       <div class="reward"><div class="ic">👤</div><div><div class="nm">Luân</div><div class="muted" style="font-size:12px">Đã liên kết Zalo · 079 928 9889</div></div></div>
       <div class="reward"><div class="ic">🔔</div><div><div class="nm">Nhận tin từ Zalo OA</div><div class="muted" style="font-size:12px">Ưu đãi & cập nhật đơn hàng</div></div><div style="margin-left:auto;width:42px;height:24px;background:var(--green);border-radius:14px;position:relative"><div style="position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:2px;right:2px"></div></div></div>
-      <div class="reward" onclick="openOrders()" style="cursor:pointer"><div class="ic">📦</div><div style="flex:1"><div class="nm">Đơn hàng của tôi</div><div class="muted" style="font-size:12px" id="acc-orders">Chưa có đơn nào</div></div><div style="color:var(--ink-soft);font-size:20px">›</div></div>
+      <div class="reward" data-a="openOrders" style="cursor:pointer"><div class="ic">📦</div><div style="flex:1"><div class="nm">Đơn hàng của tôi</div><div class="muted" style="font-size:12px" id="acc-orders">Chưa có đơn nào</div></div><div style="color:var(--ink-soft);font-size:20px">›</div></div>
       <div class="reward"><div class="ic">📍</div><div><div class="nm">Chi nhánh</div><div class="muted" style="font-size:12px">39A Bến Nghé · 02 Đặng Thái Thân, Huế</div></div></div>
       <div class="reward"><div class="ic">☎️</div><div><div class="nm">Hotline</div><div class="muted" style="font-size:12px">079 928 9889</div></div></div>
-      <div class="reward" onclick="openPolicy('privacy')" style="cursor:pointer"><div class="ic">🔒</div><div style="flex:1"><div class="nm">Chính sách quyền riêng tư</div><div class="muted" style="font-size:12px">Cách Bunbun thu thập & dùng dữ liệu</div></div><div style="color:var(--ink-soft);font-size:20px">›</div></div>
-      <div class="reward" onclick="openPolicy('terms')" style="cursor:pointer"><div class="ic">📜</div><div style="flex:1"><div class="nm">Điều khoản sử dụng</div><div class="muted" style="font-size:12px">Quy định khi dùng Mini App</div></div><div style="color:var(--ink-soft);font-size:20px">›</div></div>
+      <div class="reward" data-a="openPolicy" data-v="privacy" style="cursor:pointer"><div class="ic">🔒</div><div style="flex:1"><div class="nm">Chính sách quyền riêng tư</div><div class="muted" style="font-size:12px">Cách Bunbun thu thập & dùng dữ liệu</div></div><div style="color:var(--ink-soft);font-size:20px">›</div></div>
+      <div class="reward" data-a="openPolicy" data-v="terms" style="cursor:pointer"><div class="ic">📜</div><div style="flex:1"><div class="nm">Điều khoản sử dụng</div><div class="muted" style="font-size:12px">Quy định khi dùng Mini App</div></div><div style="color:var(--ink-soft);font-size:20px">›</div></div>
       <div style="padding:0 16px;margin-top:8px"><div class="muted" style="font-size:11px;text-align:center;line-height:1.5">Bunbun Burger · Tự hào là thương hiệu burger Made in Huế<br>39A Bến Nghé, P. Phú Hội, TP. Huế · Hotline 079 928 9889</div></div>
     </section>
 
   </div>
 
   <!-- floating cart (pinned above tab bar) -->
-  <div class="cartbar" id="cartbar" onclick="openCart()">
+  <div class="cartbar" id="cartbar" data-a="openCart">
     <div class="cnt" id="cart-cnt">0</div>
     <div class="t">Xem giỏ hàng</div>
     <div class="tot" id="cart-tot">0đ</div>
@@ -500,21 +503,21 @@ body{background:var(--cream);}
 
   <!-- BOTTOM TABS -->
   <div class="tabbar">
-    <button class="tab on" data-v="home" onclick="go('home')">
+    <button class="tab on" data-v="home" data-a="go" data-v="home">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5 5 4.5h14l1 4"/><path d="M4 8.5c0 1.1.9 1.8 1.9 1.8s1.9-.7 1.9-1.8c0 1.1.9 1.8 2 1.8s2-.7 2-1.8c0 1.1.9 1.8 2 1.8s1.9-.7 1.9-1.8"/><path d="M5.5 10.3V20h13v-9.7"/><path d="M10 20v-4.5h4V20"/></svg>Trang chủ</button>
-    <button class="tab" data-v="menu" onclick="go('menu')">
+    <button class="tab" data-v="menu" data-a="go" data-v="menu">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9c0-3 3.6-5 8-5s8 2 8 5"/><path d="M8.5 6.6h.01M12 6h.01M15.4 6.7h.01"/><path d="M3.5 12.4h17"/><path d="M4.2 15.8h15.6c0 2.4-2 4.2-4.2 4.2H8.4c-2.2 0-4.2-1.8-4.2-4.2z"/></svg>Đặt món</button>
-    <button class="tab" data-v="loyalty" onclick="go('loyalty')">
+    <button class="tab" data-v="loyalty" data-a="go" data-v="loyalty">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M2.5 9.5h19"/><path d="M16.5 12.6l.8 1.7 1.8.2-1.3 1.2.4 1.8-1.7-1-1.7 1 .4-1.8-1.3-1.2 1.8-.2z"/><path d="M5.5 14h5"/></svg>Tích điểm</button>
-    <button class="tab" data-v="account" onclick="go('account')">
+    <button class="tab" data-v="account" data-a="go" data-v="account">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c0-3.9 3.4-6.2 7.5-6.2s7.5 2.3 7.5 6.2"/></svg>Tài khoản</button>
   </div>
 
   <!-- SHEET (cart + checkout) -->
-  <div class="scrim" id="scrim" onclick="closeSheet()"></div>
+  <div class="scrim" id="scrim" data-a="closeSheet"></div>
   <div class="sheet" id="sheet">
     <div class="grab"></div>
-    <div class="shead"><h3 id="sheet-title">Giỏ hàng</h3><button class="x" onclick="closeSheet()">✕</button></div>
+    <div class="shead"><h3 id="sheet-title">Giỏ hàng</h3><button class="x" data-a="closeSheet">✕</button></div>
     <div class="sbody" id="sheet-body"></div>
     <div class="sfoot" id="sheet-foot"></div>
   </div>
@@ -529,7 +532,7 @@ body{background:var(--cream);}
       <div class="av">B</div>
       <div class="tx"><b>Bunbun Burger (Zalo OA)</b><br>Cảm ơn Luân! Đơn <span id="suc-order">#BB000</span> đã nhận. Bạn vừa nhận thêm điểm thưởng — xem ngay trong ví thành viên nhé!</div>
     </div>
-    <button class="btn" style="max-width:280px" onclick="afterSuccess()">Xong</button>
+    <button class="btn" style="max-width:280px" data-a="afterSuccess">Xong</button>
   </div>
 
   <!-- HANDOFF (giao tận nơi qua đối tác) -->
@@ -541,8 +544,8 @@ body{background:var(--cream);}
       <div class="av" id="ho-av" style="background:#00B14F">G</div>
       <div class="tx" id="ho-tx"></div>
     </div>
-    <button class="btn" id="ho-open" style="max-width:300px" onclick="openPartner()">Mở đối tác để giao →</button>
-    <button class="btn ghost" style="max-width:300px;margin-top:8px" onclick="closeHandoff()">Để sau</button>
+    <button class="btn" id="ho-open" style="max-width:300px" data-a="openPartner">Mở đối tác để giao →</button>
+    <button class="btn ghost" style="max-width:300px;margin-top:8px" data-a="closeHandoff">Để sau</button>
   </div>
 
   <!-- ONBOARDING / OA LINK -->
@@ -558,14 +561,15 @@ body{background:var(--cream);}
       <div><div class="nm">Bunbun Burger OA</div><div class="sb">Quan tâm để mở khóa tích điểm</div></div>
       <div class="ck" id="oa-check" style="display:none">✓</div>
     </div>
-    <button class="btn btn-white" id="onb-btn" onclick="linkOA()">Quan tâm OA & Bắt đầu</button>
-    <button class="skip" onclick="dismissOnb()">Để sau, vào xem trước</button>
+    <button class="btn btn-white" id="onb-btn" data-a="linkOA">Quan tâm OA & Bắt đầu</button>
+    <button class="skip" data-a="dismissOnb">Để sau, vào xem trước</button>
   </div>
 
   <div class="toast" id="toast"></div>
-</div>
+`;
+(function(){var st=document.createElement("style");st.textContent=__CSS;document.head.appendChild(st);document.getElementById("app").innerHTML=__TPL;})();
 
-<script>
+
 /* ================= DATA ================= */
 /* ---- Minh hoạ món ăn bằng SVG (hiển thị ổn định, không cần mạng) ---- */
 function di(inner, c1='#FFE3C7', c2='#FFC9A0'){
@@ -775,9 +779,10 @@ let AVAIL = {};                            // { itemId: 'available'|'low'|'soldo
 let menuMeta = { version:null, updatedAt:null, source:'bundled' };
 const LS = { menu:'bb_menu_cache', etag:'bb_menu_etag', avail:'bb_avail_cache' };
 
+const API_BASE_URL = "https://vmmjvkotttbxoyforxgh.functions.supabase.co";
 function apiBase(){
-  const b = (window.Zalo && window.Zalo.CONFIG && window.Zalo.CONFIG.API_BASE) || '';
-  return /^https?:\/\//.test(b) ? b.replace(/\/$/,'') : '';   // '' = chưa cấu hình
+  const b = API_BASE_URL || (window.Zalo && window.Zalo.CONFIG && window.Zalo.CONFIG.API_BASE) || '';
+  return /^https?:\/\//.test(b) ? b.replace(/\/$/,'') : '';
 }
 function timeHM(ts){ const d=ts?new Date(ts):new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 function lsGet(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(_){ return null; } }
@@ -928,10 +933,10 @@ function pic(it){
 function dishCard(it){
   const so=isSoldout(it.id);
   const badge = so?'<span class="soldlbl">Tạm hết</span>' : (it.hot?'<span class="hot">Best seller</span>':'');
-  return `<div class="dish${so?' soldout':''}" onclick="${so?`toast('Món đang tạm hết')`:`openItem('${it.id}')`}">
+  return `<div class="dish${so?' soldout':''}" data-a="${so?'soldout':'openItem'}" data-v="${it.id}">
     <div class="img">${pic(it)}${badge}</div>
     <div class="b"><div class="nm">${it.nm}</div>
-      <div class="pr">${fmt(it.pr)}<button class="add" ${so?'disabled':''} onclick="event.stopPropagation();openItem('${it.id}')">+</button></div>
+      <div class="pr">${fmt(it.pr)}<button class="add" ${so?'disabled':''} data-a="openItem" data-v="${it.id}">+</button></div>
     </div></div>`;
 }
 function catItems(name){ const c=MENU.find(c=>c.cat===name); return c?c.items:[]; }
@@ -946,7 +951,7 @@ function renderHome(){
 let activeCat = "Burger";
 function itemCount(id){ return state.lines.filter(l=>l.it.id===id).reduce((s,l)=>s+l.q,0); }
 function renderMenu(){
-  $('#cats').innerHTML = MENU.map(c=>`<button class="cat ${c.cat===activeCat?'on':''}" onclick="setCat('${c.cat}')">${c.cat}</button>`).join('');
+  $('#cats').innerHTML = MENU.map(c=>`<button class="cat ${c.cat===activeCat?'on':''}" data-a="setCat" data-v="${c.cat}">${c.cat}</button>`).join('');
   $('#menu-list').innerHTML = MENU.map(c=>`
     <div id="sec-${c.cat}"><div class="catlabel">${c.cat}</div>
     ${c.items.map(it=>{
@@ -954,14 +959,14 @@ function renderMenu(){
       const cz=addonsFor(it).length?'<span class="cust">tùy chọn</span>':'';
       const st=availStatus(it.id), so=st==='soldout';
       const tag = so?' <span class="soldlbl">Tạm hết</span>' : (st==='low'?' <span class="lowlbl">Sắp hết</span>' : (it.hot?' <span class=\'best\'>best seller</span>':''));
-      return `<div class="row${so?' soldout':''}" onclick="${so?`toast('Món đang tạm hết')`:`openItem('${it.id}')`}">
+      return `<div class="row${so?' soldout':''}" data-a="${so?'soldout':'openItem'}" data-v="${it.id}">
         <div class="img">${pic(it)}</div>
         <div class="info">
           <div class="nm">${it.nm}${tag}</div>
           <div class="ds">${it.ds}</div>
           <div class="rowfoot">
             <div class="pr">${fmt(it.pr)}${cz}</div>
-            <button class="addbtn" ${so?'disabled':''} onclick="event.stopPropagation();openItem('${it.id}')">+${q?`<i class="qb">${q}</i>`:''}</button>
+            <button class="addbtn" ${so?'disabled':''} data-a="openItem" data-v="${it.id}">+${q?`<i class="qb">${q}</i>`:''}</button>
           </div>
         </div></div>`;
     }).join('')}</div>`).join('');
@@ -998,12 +1003,12 @@ function renderItemSheet(){
     <div class="idetail"><div class="iimg">${pic(it)}</div>
       <div><div class="inm">${it.nm}</div><div class="ids">${it.ds}</div><div class="ipr">${fmt(it.pr)}</div></div></div>
     ${ad.length?`<div class="ogh">Thêm topping <span>(tùy chọn)</span></div>
-      ${ad.map((a,i)=>{const on=curAddons.some(x=>x.n===a.n);return `<div class="opt2 ${on?'on':''}" onclick="itemToggle(${i})"><i class="ck"></i><span class="on2">${a.n}</span><span class="op">+${fmt(a.p)}</span></div>`;}).join('')}`:''}
+      ${ad.map((a,i)=>{const on=curAddons.some(x=>x.n===a.n);return `<div class="opt2 ${on?'on':''}" data-a="itemToggle" data-v="${i}"><i class="ck"></i><span class="on2">${a.n}</span><span class="op">+${fmt(a.p)}</span></div>`;}).join('')}`:''}
     <div class="field" style="margin-top:12px"><label>Ghi chú</label><input id="noteIn" value="${curNote.replace(/"/g,'&quot;')}" placeholder="VD: ít cay, không hành..."></div>`;
   $('#sheet-foot').innerHTML=`
     <div class="iqty"><span style="font-weight:600">Số lượng</span>
-      <div class="stepper"><button onclick="itemQty(-1)">−</button><b>${curQty}</b><button onclick="itemQty(1)">+</button></div></div>
-    <button class="btn" style="margin-top:12px" onclick="confirmAddItem()">Thêm ${curQty} vào giỏ · ${fmt(unit*curQty)}</button>`;
+      <div class="stepper"><button data-a="itemQty" data-v="-1">−</button><b>${curQty}</b><button data-a="itemQty" data-v="1">+</button></div></div>
+    <button class="btn" style="margin-top:12px" data-a="confirmAddItem">Thêm ${curQty} vào giỏ · ${fmt(unit*curQty)}</button>`;
 }
 function sameAddons(a,b){ const k=x=>x.map(o=>o.n).sort().join('|'); return k(a)===k(b); }
 function addToCart(it,addons,note,qty){
@@ -1036,13 +1041,13 @@ function openCart(){
         ${c.addons.length?`<div class="cadd">+ ${c.addons.map(a=>a.n).join(', ')}</div>`:''}
         ${c.note?`<div class="cadd">📝 ${c.note}</div>`:''}
         <div class="pr">${fmt(c.unit)}</div></div>
-      <div class="stepper"><button onclick="chgLine(${i},-1);openCart()">−</button><b>${c.q}</b><button onclick="chgLine(${i},1);openCart()">+</button></div>
+      <div class="stepper"><button data-a="chgLineCart" data-i="${i}" data-d="-1">−</button><b>${c.q}</b><button data-a="chgLineCart" data-i="${i}" data-d="1">+</button></div>
     </div>`).join('') : '<p class="muted" style="text-align:center;padding:30px">Giỏ hàng trống</p>';
   const inCart=new Set(lines.map(l=>l.it.id));
   const sug=['s1','s3','n1','n8','ds2','cf1'].map(findItem).filter(it=>it && !inCart.has(it.id)).slice(0,4);
   const upsell=(lines.length && sug.length)?`
     <div class="upsell"><div class="uph">Thêm cho đủ vị?</div>
-      <div class="uprow">${sug.map(it=>`<div class="upcard" onclick="quickAdd('${it.id}')">
+      <div class="uprow">${sug.map(it=>`<div class="upcard" data-a="quickAdd" data-v="${it.id}">
         <div class="upimg">${pic(it)}</div><div class="upnm">${it.nm}</div>
         <div class="uppr">${fmt(it.pr)}<span class="upadd">+</span></div></div>`).join('')}</div></div>`:'';
   $('#sheet-body').innerHTML = body + upsell;
@@ -1050,7 +1055,7 @@ function openCart(){
   $('#sheet-foot').innerHTML=`
     <div class="earn">Đơn này tích <b>+${pts} điểm</b> Bunbun ${cartTotal()>=50000?'· +1 tem':''}</div>
     <div class="sumrow tot"><span>Tạm tính</span><span>${fmt(cartTotal())}</span></div>
-    <button class="btn" style="margin-top:10px" onclick="openCheckout()" ${cartCount()?'':'disabled'}>Tiến hành đặt món →</button>`;
+    <button class="btn" style="margin-top:10px" data-a="openCheckout" ${cartCount()?'':'disabled'}>Tiến hành đặt món →</button>`;
   showSheet();
 }
 
@@ -1071,7 +1076,7 @@ function openCheckout(){
   const pts=Math.floor(cartTotal()/1000);
   $('#sheet-body').innerHTML=`
     <div style="font-size:13px;font-weight:700;margin-bottom:8px">Hình thức nhận món</div>
-    <div class="optrow">${types.map(t=>`<div class="opt ${orderType===t.k?'on':''}" onclick="setType('${t.k}')"><div class="em">${t.e}</div><div class="t">${t.t}</div></div>`).join('')}</div>
+    <div class="optrow">${types.map(t=>`<div class="opt ${orderType===t.k?'on':''}" data-a="setType" data-v="${t.k}"><div class="em">${t.e}</div><div class="t">${t.t}</div></div>`).join('')}</div>
     ${orderType==='table'?`<div class="field"><label>Số bàn</label><input placeholder="VD: Bàn 05" value="Bàn 05"></div>`:''}
     ${isShip?`<div class="field"><label>Địa chỉ giao hàng</label><input value="123 Đường ABC, P. Phú Hội, TP. Huế"></div>`:''}
     <div class="field"><label>Ghi chú</label><input placeholder="VD: ít cay, thêm sốt..."></div>
@@ -1081,11 +1086,11 @@ function openCheckout(){
   $('#sheet-foot').innerHTML=`
     <div class="earn">+${pts} điểm khi liên kết hoá đơn iPOS ${cartTotal()>=50000?'· +1 tem':''}</div>
     <div class="sumrow tot"><span>Tạm tính</span><span>${fmt(cartTotal())}</span></div>
-    <button class="btn" style="margin-top:10px;background:${IPOS.color}" onclick="iposHandoff()">Đặt qua iPOS · ${fmt(cartTotal())} →</button>
+    <button class="btn" style="margin-top:10px;background:${IPOS.color}" data-a="iposHandoff">Đặt qua iPOS · ${fmt(cartTotal())} →</button>
     ${isShip?`<div style="text-align:center;font-size:11px;color:var(--ink-soft);margin:9px 0 5px">Hoặc đặt qua app giao hàng</div>
       <div style="display:flex;gap:8px">
-        <button class="btn ghost" style="flex:1;color:#00B14F;border-color:#00B14F" onclick="quickPartner('grab')">GrabFood</button>
-        <button class="btn ghost" style="flex:1;color:#EE4D2D;border-color:#EE4D2D" onclick="quickPartner('shopee')">ShopeeFood</button>
+        <button class="btn ghost" style="flex:1;color:#00B14F;border-color:#00B14F" data-a="quickPartner" data-v="grab">GrabFood</button>
+        <button class="btn ghost" style="flex:1;color:#EE4D2D;border-color:#EE4D2D" data-a="quickPartner" data-v="shopee">ShopeeFood</button>
       </div>`:''}`;
 }
 function setType(k){ orderType=k; openCheckout(); }
@@ -1160,11 +1165,11 @@ function openOrders(){
       <div class="orditems">${o.lines.map(l=>`<div class="oi"><span>${l.q}× ${l.it.nm}${l.addons.length?' <span class="oadd">(+'+l.addons.map(a=>a.n).join(', ')+')</span>':''}${l.note?' <span class="oadd">· '+l.note+'</span>':''}</span><span>${fmt(l.unit*l.q)}</span></div>`).join('')}</div>
       <span class="ordstatus ${o.statusType}">${o.status}${o.pts?' · +'+o.pts+' điểm':''}</span>
       <div class="ordact">
-        <button class="reord" onclick="reorderOrder(${i})">Đặt lại</button>
-        ${o.channel==='iPOS'?`<button onclick="zaloOpenIpos()">Mở iPOS</button>`:''}
+        <button class="reord" data-a="reorderOrder" data-v="${i}">Đặt lại</button>
+        ${o.channel==='iPOS'?`<button data-a="zaloOpenIpos">Mở iPOS</button>`:''}
       </div>
     </div>`).join('') : '<p class="muted" style="text-align:center;padding:36px 10px">Bạn chưa có đơn hàng nào.<br>Hãy đặt món đầu tiên nhé!</p>';
-  $('#sheet-foot').innerHTML = `<button class="btn ghost" onclick="closeSheet()">Đóng</button>`;
+  $('#sheet-foot').innerHTML = `<button class="btn ghost" data-a="closeSheet">Đóng</button>`;
   showSheet();
 }
 function reorderOrder(i){
@@ -1190,7 +1195,7 @@ function openPolicy(type){
     <p><b>4. Liên hệ.</b> Mọi thắc mắc: hotline <b>079 928 9889</b> hoặc tại quán 39A Bến Nghé, TP. Huế.</p>`;
   $('#sheet-title').textContent = type==='privacy' ? 'Chính sách quyền riêng tư' : 'Điều khoản sử dụng';
   $('#sheet-body').innerHTML = `<div style="font-size:13.5px;line-height:1.65">${type==='privacy'?privacy:terms}</div>`;
-  $('#sheet-foot').innerHTML = `<button class="btn ghost" onclick="closeSheet()">Đóng</button>`;
+  $('#sheet-foot').innerHTML = `<button class="btn ghost" data-a="closeSheet">Đóng</button>`;
   showSheet();
 }
 
@@ -1205,14 +1210,14 @@ function renderLoyalty(){
       <div class="cic">🧾</div>
       <div style="flex:1"><div style="font-weight:700;font-size:13.5px">Hoá đơn iPOS ${o.no} vừa đặt</div>
         <div style="font-size:11.5px;color:var(--ink-soft)">${fmt(o.total)} · liên kết để nhận +${o.pts} điểm${o.big?' · +1 tem':''}</div></div>
-      <button class="cbtn" onclick="claimIpos()">Liên kết</button>
+      <button class="cbtn" data-a="claimIpos">Liên kết</button>
     </div>` : '';
   $('#stamp-txt').textContent=state.stamps+'/10';
   $('#stamps').innerHTML = Array.from({length:10},(_,i)=>`<div class="stamp ${i<state.stamps?'fill':''}"></div>`).join('');
   $('#rewards').innerHTML = REWARDS.map(r=>`
     <div class="reward"><div class="ic">${r.ic}</div>
       <div><div class="nm">${r.nm}</div><div class="co">${r.co} điểm</div></div>
-      <button class="rb" ${state.points>=r.co?'':'disabled'} onclick="redeem('${r.id}')">${state.points>=r.co?'Đổi':'Thiếu '+(r.co-state.points)}</button>
+      <button class="rb" ${state.points>=r.co?'':'disabled'} data-a="redeem" data-v="${r.id}">${state.points>=r.co?'Đổi':'Thiếu '+(r.co-state.points)}</button>
     </div>`).join('');
   $('#history').innerHTML = state.history.length? state.history.map(h=>`
     <div class="histitem"><div class="ic">${h.ic}</div>
@@ -1254,25 +1259,25 @@ document.querySelectorAll('.zbar .oa .av, .onb .oalink .av, .oa-msg .av, .onb .l
 
 /* INIT */
 renderHome(); render(); bootData();   // bootData(): nếu chưa cấu hình API → giữ menu mẫu; bootstrap dưới gọi lại khi có window.Zalo
-</script>
 
-<!-- ===== Bootstrap cầu nối zmp-sdk (Prompt 2) =====
-     Module này nạp src/zalo-sdk.js và gắn vào window.Zalo để script UI ở trên
-     gọi được các API Zalo thật. Khi chạy bằng `zmp start`/trong Zalo, Vite sẽ
-     resolve "zmp-sdk". Trên trình duyệt thường (mở file trực tiếp), import có
-     thể lỗi → bắt lỗi để UI vẫn chạy ở chế độ fallback mô phỏng.
-     LƯU Ý: trước khi deploy phải điền CONFIG.OA_ID và CONFIG.GRAB_URL trong
-     src/zalo-sdk.js, và OA_ID trong app-config.json. -->
-<script type="module">
-  try{
-    const Zalo = await import('./src/zalo-sdk.js');
-    window.Zalo = Zalo;
-    console.info('[Bunbun] Đã nối zmp-sdk (window.Zalo).');
-  }catch(e){
-    console.info('[Bunbun] Chế độ trình duyệt — không có zmp-sdk, dùng fallback mô phỏng.', e);
-  }
-  // Nạp lại dữ liệu backend khi đã có CONFIG.API_BASE (window.Zalo sẵn sàng)
-  if(window.bootData) window.bootData();
+
+/* ===== Event delegation (thay onclick "" — hợp CSP Zalo Mini App) ===== */
+var FN={go:go,openPolicy:openPolicy,quickAdd:quickAdd,quickPartner:quickPartner,redeem:redeem,setCat:setCat,setType:setType,openItem:openItem,afterSuccess:afterSuccess,claimIpos:claimIpos,closeHandoff:closeHandoff,closeSheet:closeSheet,confirmAddItem:confirmAddItem,dismissOnb:dismissOnb,iposHandoff:iposHandoff,linkOA:linkOA,openCart:openCart,openCheckout:openCheckout,openOrders:openOrders,openPartner:openPartner,zaloOpenIpos:zaloOpenIpos};
+var STR={go:1,openPolicy:1,quickAdd:1,quickPartner:1,redeem:1,setCat:1,setType:1,openItem:1};
+function onAppClick(e){
+  var el=e.target.closest('[data-a]'); if(!el) return;
+  var a=el.getAttribute('data-a'), v=el.getAttribute('data-v');
+  if(a==='soldout'){ toast('Món đang tạm hết'); return; }
+  if(a==='toastmsg'){ toast(v); return; }
+  if(a==='chgLineCart'){ chgLine(+el.getAttribute('data-i'), +el.getAttribute('data-d')); openCart(); return; }
+  if(a==='itemQty'){ itemQty(+v); return; }
+  if(a==='itemToggle'){ itemToggle(+v); return; }
+  if(a==='reorderOrder'){ reorderOrder(+v); return; }
+  var fn=FN[a]; if(!fn) return;
+  STR[a]?fn(v):fn();
+}
+document.getElementById('app').addEventListener('click', onAppClick);
+
 </script>
 </body>
 </html>

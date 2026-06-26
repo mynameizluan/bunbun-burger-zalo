@@ -11,10 +11,14 @@
     "hideIOSSafeAreaBottom": false
   },
   "listCSS": [],
-  "listSyncJS": [],
+  "listSyncJS": [
+    "inline.js"
+  ],
   "listAsyncJS": [],
   "pages": {
-    "home": { "title": "Bunbun Burger" }
+    "home": {
+      "title": "Bunbun Burger"
+    }
   },
   "oaIDtoOpenChat": "1583148066946026012",
   "template": {
