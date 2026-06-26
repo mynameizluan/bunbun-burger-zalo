@@ -15,6 +15,16 @@ hướng **Webview/handoff với iPOS** (Phase 1 — nhanh, không cần backend
 
 ---
 
+## Định danh dự án (đã có)
+| Khóa | Giá trị | Dùng ở |
+|---|---|---|
+| **Mini App ID** | `2519356415006132161` | nhập khi `zmp init` |
+| **OA ID** | `1583148066946026012` | `app-config.json`, `src/zalo-sdk.js` (đã điền) |
+| **GrabFood URL** | đã điền (`GRAB_URL`) | `src/zalo-sdk.js` |
+| **API_BASE** | ⏳ chờ deploy Supabase | `src/zalo-sdk.js` |
+
+---
+
 ## 0) Chuẩn bị (1 lần)
 1. Tạo tài khoản tại **https://developers.zalo.me** → tạo **Zalo App** → **Tạo Mini App** → lấy **Mini App ID**.
 2. Xác thực **OA doanh nghiệp Bunbun** (cần để bật OA, ZNS, lấy số điện thoại) → lấy **OA ID**.
