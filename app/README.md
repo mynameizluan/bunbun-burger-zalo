@@ -59,10 +59,17 @@ gắn vào `window.Zalo`. Script UI gọi qua các hàm cầu nối có **fallba
 > chiếm full màn hình. Nguồn chân lý UI gốc vẫn ở `prototype/bunbun-miniapp.html`.
 
 ## 4) Chạy thử & deploy
+> ⚠️ Zalo **không phục vụ index.html**: nó chỉ nạp JS khai báo ở `listSyncJS` vào khung
+> `#app` có sẵn, và **CSP chặn inline script + onclick**. Vì vậy app này:
+> - JS **tự chèn CSS + HTML** vào `#app` (chạy trong `__boot` lúc DOMContentLoaded).
+> - Mọi tương tác dùng **`data-a` + event delegation** (không `onclick=`).
+> - **KHÔNG chạy `zmp sync-config`** (nó nhồi `<script>` vào template literal → backtick
+>   trong code làm vỡ cú pháp → trắng màn hình). Dùng script build riêng:
 ```bash
-zmp start                # xem trước (browser hoặc Device mode bằng QR trong app Zalo)
-zmp deploy               # đưa lên bản Testing
+node build-zmp.mjs       # tạo dist/inline.js (= script hợp lệ) + set app-config listSyncJS
+zmp deploy               # chọn thư mục dist, bản Testing
 ```
+> Local preview: mở thẳng `index.html` trên trình duyệt (JS tự dựng UI, fetch Supabase chạy).
 Vào **Zalo → quét QR Testing** để thử trên máy thật trước khi nộp duyệt.
 
 ## 5) Nộp xét duyệt

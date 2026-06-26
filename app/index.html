@@ -11,6 +11,8 @@
 <body>
 <div id="app"></div>
 <script>
+function __boot(){
+try{
 /* CSS + HTML do JS chèn (Zalo không phục vụ index.html, chỉ chạy inline.js) */
 var __CSS=`
 :root{
@@ -567,7 +569,10 @@ var __TPL=`
 
   <div class="toast" id="toast"></div>
 `;
-(function(){var st=document.createElement("style");st.textContent=__CSS;document.head.appendChild(st);document.getElementById("app").innerHTML=__TPL;})();
+var __app=document.getElementById("app");
+if(!__app){__app=document.createElement("div");__app.id="app";(document.body||document.documentElement).appendChild(__app);}
+var __st=document.createElement("style");__st.textContent=__CSS;(document.head||document.documentElement).appendChild(__st);
+__app.innerHTML=__TPL;
 
 
 /* ================= DATA ================= */
@@ -1278,6 +1283,11 @@ function onAppClick(e){
 }
 document.getElementById('app').addEventListener('click', onAppClick);
 
+}catch(__e){
+document.body&&(document.body.innerHTML="<pre style=\"padding:16px;font:13px monospace;color:#900;white-space:pre-wrap\">BOOT ERROR: "+(__e&&__e.stack||__e)+"</pre>");
+throw __e;}
+}
+if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",__boot);}else{__boot();}
 </script>
 </body>
 </html>
