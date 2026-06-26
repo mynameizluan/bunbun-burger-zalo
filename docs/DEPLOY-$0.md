@@ -19,17 +19,21 @@ Ký hiệu: 🧑 = việc cần tài khoản/danh tính của bạn · 💻 = ch
 1. 🧑 https://supabase.com → **New Project** `bunbun` (region Singapore), lưu mật khẩu DB.
 2. 🧑 **Settings → API**: copy `Project URL`, `service_role`, `anon`.
 3. 💻 Copy `backend/.env.example` → `backend/.env`, điền:
-   - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY`
-   - `ZALO_APP_SECRET` (để đổi token SĐT → số thật)
    - `ADMIN_TOKEN` = **chuỗi ngẫu nhiên dài** (mật khẩu vào 2 trang admin)
-   - *(IPOS_* để trống — chỉ cần nếu sau này mua API)*
+   - `ZALO_APP_SECRET` (để đổi token SĐT → số thật, cho crm-points)
+   - *(SUPABASE_URL/SERVICE_ROLE_KEY: Supabase tự cấp cho function — không cần set)*
 4. 🧑 **SQL Editor** → dán toàn bộ `backend/schema.sql` → **Run** (tạo 7 bảng).
-5. 💻 Đăng nhập & nạp secrets + deploy function:
+5. 💻 Đăng nhập, dựng thư mục function, nạp secrets, deploy:
    ```bash
    supabase login
+   supabase init                       # tạo supabase/config.toml
    supabase link --project-ref <PROJECT_REF>
-   supabase secrets set --env-file ./backend/.env
-   # đặt mỗi file backend/functions/<tên>.ts vào supabase/functions/<tên>/index.ts rồi:
+   # chép function sang layout CLI cần:
+   for f in menu availability crm-points menu-admin members-admin; do \
+     mkdir -p supabase/functions/$f && cp backend/functions/$f.ts supabase/functions/$f/index.ts; done
+   # secrets (KHÔNG set biến tiền tố SUPABASE_):
+   supabase secrets set ADMIN_TOKEN='<token>' ZALO_APP_SECRET='<app secret>'
+   # deploy:
    supabase functions deploy menu --no-verify-jwt
    supabase functions deploy availability --no-verify-jwt
    supabase functions deploy crm-points --no-verify-jwt

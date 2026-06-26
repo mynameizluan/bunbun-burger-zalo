@@ -22,9 +22,14 @@ supabase login                       # mở trình duyệt, anh xác nhận
 supabase link --project-ref <PROJECT_REF>   # REF nằm trong Project URL
 ```
 
-## 5. Nạp biến môi trường cho Edge Functions
+## 5. Nạp secrets cho Edge Functions
+> ⚠️ `SUPABASE_URL` và `SUPABASE_SERVICE_ROLE_KEY` được Supabase **tự cấp** cho mọi Edge
+> Function — **không** set chúng (tên có tiền tố `SUPABASE_` bị CLI từ chối). Chỉ set
+> các secret riêng của bạn:
 ```bash
-supabase secrets set --env-file ./backend/.env
+supabase secrets set ADMIN_TOKEN='<chuỗi ngẫu nhiên dài>'      # cho menu-admin/members-admin
+supabase secrets set ZALO_APP_SECRET='<App Secret ở developers.zalo.me>'  # cho crm-points
+# (chỉ khi mua API iPOS) supabase secrets set IPOS_API_BASE='...' IPOS_API_KEY='...'
 ```
 
 ## 6. Deploy endpoint + Scheduled Function

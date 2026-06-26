@@ -6,3 +6,4 @@ dist/
 *.log
 .zmp/
 .claude/settings.local.json
+supabase/
