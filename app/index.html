@@ -490,6 +490,7 @@ var __TPL=`
       <div class="reward"><div class="ic">☎️</div><div><div class="nm">Hotline</div><div class="muted" style="font-size:12px">079 928 9889</div></div></div>
       <div class="reward" data-a="openPolicy" data-v="privacy" style="cursor:pointer"><div class="ic">🔒</div><div style="flex:1"><div class="nm">Chính sách quyền riêng tư</div><div class="muted" style="font-size:12px">Cách Bunbun thu thập & dùng dữ liệu</div></div><div style="color:var(--ink-soft);font-size:20px">›</div></div>
       <div class="reward" data-a="openPolicy" data-v="terms" style="cursor:pointer"><div class="ic">📜</div><div style="flex:1"><div class="nm">Điều khoản sử dụng</div><div class="muted" style="font-size:12px">Quy định khi dùng Mini App</div></div><div style="color:var(--ink-soft);font-size:20px">›</div></div>
+      <div class="reward" data-a="showDebug" style="cursor:pointer"><div class="ic">🔧</div><div style="flex:1"><div class="nm">Chẩn đoán kỹ thuật</div><div class="muted" style="font-size:12px">Kiểm tra kết nối &amp; SDK (tạm thời)</div></div><div style="color:var(--ink-soft);font-size:20px">›</div></div>
       <div style="padding:0 16px;margin-top:8px"><div class="muted" style="font-size:11px;text-align:center;line-height:1.5">Bunbun Burger · Tự hào là thương hiệu burger Made in Huế<br>39A Bến Nghé, P. Phú Hội, TP. Huế · Hotline 079 928 9889</div></div>
     </section>
 
@@ -1085,6 +1086,25 @@ const BRANCHES=[
   {nm:'Bunbun Burger · CS1 (Bến Nghé)', addr:'39A Bến Nghé, P. Phú Hội, TP. Huế', maps:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent('Bunbun Burger 39A Bến Nghé, Phú Hội, Huế')},
   {nm:'Bunbun Burger · CS2 (Đặng Thái Thân)', addr:'02 Đặng Thái Thân, TP. Huế', maps:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent('Bunbun Burger 02 Đặng Thái Thân, Huế')}
 ];
+function showDebug(){
+  const sdk=window.ZaloMiniAppSDK;
+  const rows=[
+    ['ZaloMiniAppSDK', sdk?('CÓ ('+Object.keys(sdk).length+' keys)'):'KHÔNG có'],
+    ['openWebview', sdk?(typeof sdk.openWebview):'-'],
+    ['openOutApp', sdk?(typeof sdk.openOutApp):'-'],
+    ['AdtimaZMA', window.AdtimaZMA?'có':'không'],
+    ['Menu nguồn', menuMeta.source+' · v'+(menuMeta.version||'-')],
+    ['Số món hiện tại', String(MENU.reduce((s,g)=>s+g.items.length,0))],
+    ['API_BASE', apiBase()||'(trống)'],
+    ['UA', (navigator.userAgent||'').slice(0,70)]
+  ];
+  $('#sheet-title').textContent='Chẩn đoán kỹ thuật';
+  $('#sheet-body').innerHTML='<div style="font:12px/1.8 ui-monospace,monospace;word-break:break-all">'
+    +rows.map(r=>`<div><b>${r[0]}:</b> ${r[1]}</div>`).join('')
+    +'<div style="margin-top:10px;color:var(--ink-soft)">• Menu nguồn = "api" nghĩa là fetch Supabase OK (đã whitelist).<br>• ZaloMiniAppSDK = CÓ nghĩa là mở link sẽ chạy.</div></div>';
+  $('#sheet-foot').innerHTML='<button class="btn ghost" data-a="closeSheet">Đóng</button>';
+  showSheet();
+}
 function openBranches(){
   $('#sheet-title').textContent='Chi nhánh Bunbun';
   $('#sheet-body').innerHTML = BRANCHES.map((b,i)=>`
@@ -1292,7 +1312,7 @@ renderHome(); render(); bootData();   // bootData(): nếu chưa cấu hình API
 
 
 /* ===== Event delegation (thay onclick "" — hợp CSP Zalo Mini App) ===== */
-var FN={go:go,openPolicy:openPolicy,quickAdd:quickAdd,quickPartner:quickPartner,redeem:redeem,setCat:setCat,setType:setType,openItem:openItem,afterSuccess:afterSuccess,claimIpos:claimIpos,closeHandoff:closeHandoff,closeSheet:closeSheet,confirmAddItem:confirmAddItem,dismissOnb:dismissOnb,iposHandoff:iposHandoff,linkOA:linkOA,openCart:openCart,openCheckout:openCheckout,openOrders:openOrders,openPartner:openPartner,zaloOpenIpos:zaloOpenIpos,openBranches:openBranches};
+var FN={go:go,openPolicy:openPolicy,quickAdd:quickAdd,quickPartner:quickPartner,redeem:redeem,setCat:setCat,setType:setType,openItem:openItem,afterSuccess:afterSuccess,claimIpos:claimIpos,closeHandoff:closeHandoff,closeSheet:closeSheet,confirmAddItem:confirmAddItem,dismissOnb:dismissOnb,iposHandoff:iposHandoff,linkOA:linkOA,openCart:openCart,openCheckout:openCheckout,openOrders:openOrders,openPartner:openPartner,zaloOpenIpos:zaloOpenIpos,openBranches:openBranches,showDebug:showDebug};
 var STR={go:1,openPolicy:1,quickAdd:1,quickPartner:1,redeem:1,setCat:1,setType:1,openItem:1};
 function onAppClick(e){
   var el=e.target.closest('[data-a]'); if(!el) return;
