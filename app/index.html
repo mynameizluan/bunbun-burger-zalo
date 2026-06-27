@@ -887,11 +887,13 @@ function go(v){
    mode 'in' = webview trong app (iPOS); 'out' = mở app/trình duyệt ngoài (Grab/Shopee/Maps). */
 function openUrl(url, mode){
   const sdk = window.ZaloMiniAppSDK;
-  if(sdk){
+  if(sdk && typeof sdk.openWebview==='function'){
+    const onFail=function(e){ toast('Mở lỗi: '+(((e&&(e.message||e.error))||JSON.stringify(e))+'').slice(0,90)); };
     try{
-      if(mode==='out' && typeof sdk.openOutApp==='function'){ sdk.openOutApp({url:url}); return; }
-      if(typeof sdk.openWebview==='function'){ sdk.openWebview({url:url}); return; }
-    }catch(e){ console.warn('[Bunbun] SDK open lỗi:',e); }
+      const p = sdk.openWebview({ url:url, success:function(){}, fail:onFail });
+      if(p && typeof p.then==='function') p.then(function(){}, onFail);
+      return;
+    }catch(e){ toast('SDK lỗi: '+((e&&e.message)||e)); return; }
   }
   window.open(url,'_blank','noopener');   // fallback (trình duyệt/local)
 }
