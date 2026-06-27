@@ -12,6 +12,7 @@
   },
   "listCSS": [],
   "listSyncJS": [
+    "zmp-sdk.js",
     "inline.js"
   ],
   "listAsyncJS": [],

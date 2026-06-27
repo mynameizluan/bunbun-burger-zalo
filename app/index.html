@@ -421,7 +421,7 @@ var __TPL=`
         <button class="q" data-a="go" data-v="menu"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9c0-3 3.6-5 8-5s8 2 8 5"/><path d="M8.5 6.6h.01M12 6h.01M15.4 6.7h.01"/><path d="M3.5 12.4h17"/><path d="M4.2 15.8h15.6c0 2.4-2 4.2-4.2 4.2H8.4c-2.2 0-4.2-1.8-4.2-4.2z"/></svg></div>Đặt món</button>
         <button class="q" data-a="go" data-v="loyalty"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M3 9.5h18"/><path d="M16.5 13l.7 1.5 1.6.2-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6-1.2-1.1 1.6-.2z"/><path d="M6 14.5h4"/></svg></div>Tích điểm</button>
         <button class="q" data-a="go" data-v="loyalty"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11h15v7.5a1 1 0 0 1-1 1H5.5a1 1 0 0 1-1-1z"/><path d="M3.5 7.5h17V11h-17z"/><path d="M12 7.5v12"/><path d="M12 7.5C9.5 7.5 7.8 6.2 8.6 4.7 9.3 3.5 12 4.8 12 7.5c0-2.7 2.7-4 3.4-2.8.8 1.5-.9 2.8-3.4 2.8"/></svg></div>Đổi quà</button>
-        <button class="q" data-a="toastmsg" data-v="39A Bến Nghé, TP. Huế"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c4.5-4.2 7-7.4 7-11a7 7 0 0 0-14 0c0 3.6 2.5 6.8 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg></div>Chi nhánh</button>
+        <button class="q" data-a="openBranches"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c4.5-4.2 7-7.4 7-11a7 7 0 0 0-14 0c0 3.6 2.5 6.8 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg></div>Chi nhánh</button>
       </div>
 
       <div class="minicard" data-a="go" data-v="loyalty">
@@ -487,7 +487,6 @@ var __TPL=`
       <div class="reward"><div class="ic">👤</div><div><div class="nm">Luân</div><div class="muted" style="font-size:12px">Đã liên kết Zalo · 079 928 9889</div></div></div>
       <div class="reward"><div class="ic">🔔</div><div><div class="nm">Nhận tin từ Zalo OA</div><div class="muted" style="font-size:12px">Ưu đãi & cập nhật đơn hàng</div></div><div style="margin-left:auto;width:42px;height:24px;background:var(--green);border-radius:14px;position:relative"><div style="position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:2px;right:2px"></div></div></div>
       <div class="reward" data-a="openOrders" style="cursor:pointer"><div class="ic">📦</div><div style="flex:1"><div class="nm">Đơn hàng của tôi</div><div class="muted" style="font-size:12px" id="acc-orders">Chưa có đơn nào</div></div><div style="color:var(--ink-soft);font-size:20px">›</div></div>
-      <div class="reward"><div class="ic">📍</div><div><div class="nm">Chi nhánh</div><div class="muted" style="font-size:12px">39A Bến Nghé · 02 Đặng Thái Thân, Huế</div></div></div>
       <div class="reward"><div class="ic">☎️</div><div><div class="nm">Hotline</div><div class="muted" style="font-size:12px">079 928 9889</div></div></div>
       <div class="reward" data-a="openPolicy" data-v="privacy" style="cursor:pointer"><div class="ic">🔒</div><div style="flex:1"><div class="nm">Chính sách quyền riêng tư</div><div class="muted" style="font-size:12px">Cách Bunbun thu thập & dùng dữ liệu</div></div><div style="color:var(--ink-soft);font-size:20px">›</div></div>
       <div class="reward" data-a="openPolicy" data-v="terms" style="cursor:pointer"><div class="ic">📜</div><div style="flex:1"><div class="nm">Điều khoản sử dụng</div><div class="muted" style="font-size:12px">Quy định khi dùng Mini App</div></div><div style="color:var(--ink-soft);font-size:20px">›</div></div>
@@ -883,14 +882,21 @@ function go(v){
    CHỈ nạp được khi chạy/biên dịch bằng zmp (Vite resolve "zmp-sdk").
    Khi test trên trình duyệt thường → window.Zalo có thể undefined; mọi hàm
    dưới đây tự fallback về hành vi mô phỏng (window.open) để app vẫn chạy.   */
-function zaloOpenIpos(){
-  if(window.Zalo && window.Zalo.openIposOrder){ window.Zalo.openIposOrder(); return; }
-  window.open(IPOS.url,'_blank','noopener');
+/* Mở URL ngoài đúng cách trong Zalo Mini App (window.open bị chặn).
+   mode 'in' = webview trong app (iPOS); 'out' = mở app/trình duyệt ngoài (Grab/Shopee/Maps). */
+function openUrl(url, mode){
+  const sdk = window.ZaloMiniAppSDK;
+  if(sdk){
+    try{
+      if(mode==='out' && typeof sdk.openOutApp==='function'){ sdk.openOutApp({url:url}); return; }
+      if(typeof sdk.openWebview==='function'){ sdk.openWebview({url:url}); return; }
+    }catch(e){ console.warn('[Bunbun] SDK open lỗi:',e); }
+  }
+  window.open(url,'_blank','noopener');   // fallback (trình duyệt/local)
 }
-function zaloOpenPartner(which){
-  if(window.Zalo && window.Zalo.openPartner){ window.Zalo.openPartner(which); return; }
-  window.open(PARTNERS[which].url,'_blank','noopener');
-}
+function zaloOpenIpos(){ openUrl(IPOS.url, 'in'); }
+function zaloOpenPartner(which){ openUrl(PARTNERS[which].url, 'out'); }
+function openMaps(i){ const b=BRANCHES[+i]; if(b) openUrl(b.maps, 'out'); }
 /* Cập nhật tên người dùng lấy từ Zalo (getUser) lên các chỗ hiển thị "Luân". */
 function applyUserName(name){
   if(!name) return;
@@ -1074,6 +1080,25 @@ const PARTNERS={
   grab:{name:'GrabFood', color:'#00B14F', letter:'G', url:'https://r.grab.com/g/6-20260626_145322_2FCABCFD42374B7490A3C8B3F233390E_MEXMPS-5-C7V1V4CBFFBKFA'},
   shopee:{name:'ShopeeFood', color:'#EE4D2D', letter:'S', url:'https://shopeefood.vn/hue/bunbun-burger-39a-ben-nghe'}
 };
+/* Chi nhánh — link Google Maps mở bằng openOutApp */
+const BRANCHES=[
+  {nm:'Bunbun Burger · CS1 (Bến Nghé)', addr:'39A Bến Nghé, P. Phú Hội, TP. Huế', maps:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent('Bunbun Burger 39A Bến Nghé, Phú Hội, Huế')},
+  {nm:'Bunbun Burger · CS2 (Đặng Thái Thân)', addr:'02 Đặng Thái Thân, TP. Huế', maps:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent('Bunbun Burger 02 Đặng Thái Thân, Huế')}
+];
+function openBranches(){
+  $('#sheet-title').textContent='Chi nhánh Bunbun';
+  $('#sheet-body').innerHTML = BRANCHES.map((b,i)=>`
+    <div class="reward" style="align-items:flex-start">
+      <div class="ic">📍</div>
+      <div style="flex:1">
+        <div class="nm">${b.nm}</div>
+        <div class="muted" style="font-size:12.5px;margin:2px 0 8px">${b.addr}</div>
+        <button class="btn ghost" style="padding:8px 14px;font-size:13px;width:auto;display:inline-flex" data-a="maps" data-v="${i}">🧭 Chỉ đường Google Maps</button>
+      </div>
+    </div>`).join('') + `<div class="muted" style="text-align:center;font-size:12px;margin-top:10px">Mở 09:00–22:00 · Hotline 079 928 9889</div>`;
+  $('#sheet-foot').innerHTML = `<button class="btn ghost" data-a="closeSheet">Đóng</button>`;
+  showSheet();
+}
 function openCheckout(){
   $('#sheet-title').textContent='Xác nhận đơn';
   const types=[{k:'table',e:'🍽️',t:'Tại bàn'},{k:'take',e:'🥡',t:'Mang về'},{k:'ship',e:'🛵',t:'Giao tận nơi'}];
@@ -1267,13 +1292,14 @@ renderHome(); render(); bootData();   // bootData(): nếu chưa cấu hình API
 
 
 /* ===== Event delegation (thay onclick "" — hợp CSP Zalo Mini App) ===== */
-var FN={go:go,openPolicy:openPolicy,quickAdd:quickAdd,quickPartner:quickPartner,redeem:redeem,setCat:setCat,setType:setType,openItem:openItem,afterSuccess:afterSuccess,claimIpos:claimIpos,closeHandoff:closeHandoff,closeSheet:closeSheet,confirmAddItem:confirmAddItem,dismissOnb:dismissOnb,iposHandoff:iposHandoff,linkOA:linkOA,openCart:openCart,openCheckout:openCheckout,openOrders:openOrders,openPartner:openPartner,zaloOpenIpos:zaloOpenIpos};
+var FN={go:go,openPolicy:openPolicy,quickAdd:quickAdd,quickPartner:quickPartner,redeem:redeem,setCat:setCat,setType:setType,openItem:openItem,afterSuccess:afterSuccess,claimIpos:claimIpos,closeHandoff:closeHandoff,closeSheet:closeSheet,confirmAddItem:confirmAddItem,dismissOnb:dismissOnb,iposHandoff:iposHandoff,linkOA:linkOA,openCart:openCart,openCheckout:openCheckout,openOrders:openOrders,openPartner:openPartner,zaloOpenIpos:zaloOpenIpos,openBranches:openBranches};
 var STR={go:1,openPolicy:1,quickAdd:1,quickPartner:1,redeem:1,setCat:1,setType:1,openItem:1};
 function onAppClick(e){
   var el=e.target.closest('[data-a]'); if(!el) return;
   var a=el.getAttribute('data-a'), v=el.getAttribute('data-v');
   if(a==='soldout'){ toast('Món đang tạm hết'); return; }
   if(a==='toastmsg'){ toast(v); return; }
+  if(a==='maps'){ openMaps(v); return; }
   if(a==='chgLineCart'){ chgLine(+el.getAttribute('data-i'), +el.getAttribute('data-d')); openCart(); return; }
   if(a==='itemQty'){ itemQty(+v); return; }
   if(a==='itemToggle'){ itemToggle(+v); return; }
