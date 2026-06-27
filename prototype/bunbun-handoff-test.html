@@ -414,7 +414,7 @@ var __TPL=`
         <span class="tag">Món tủ · Made in Huế</span>
         <h2>Burger Tôm<br>Xốt Cay Đặc Biệt</h2>
         <p>Tôm giòn rụm, xốt cay đặc trưng Bunbun. Burger chỉ từ 39K.</p>
-        <button class="cta" data-a="orderIpos">Đặt món ngay →</button>
+        <button class="cta" data-a="openOrderSheet">Đặt món ngay →</button>
       </div>
 
       <div class="quick">
@@ -497,8 +497,8 @@ var __TPL=`
   </div>
 
   <!-- floating cart (pinned above tab bar) -->
-  <div class="cartbar show" id="orderbar" data-a="orderIpos">
-    <div class="t" style="flex:1;text-align:center;font-weight:700;font-size:15px">🍔 Đặt món trên iPOS</div>
+  <div class="cartbar show" id="orderbar" data-a="openOrderSheet">
+    <div class="t" style="flex:1;text-align:center;font-weight:700;font-size:15px">🍔 Đặt món</div>
     <div class="tot">→</div>
   </div>
 
@@ -998,8 +998,27 @@ function addonsFor(it){
   return ADDONS[it.id]||[];
 }
 let curItem=null, curQty=1, curAddons=[], curNote='';
-function orderIpos(){ zaloOpenIpos(); setTimeout(function(){ toast('Đặt xong trên iPOS? Vào Tích điểm để liên kết hoá đơn nhận điểm.'); }, 700); }
-function openItem(id){ if(isSoldout(id)){ toast('Món đang tạm hết'); return; } orderIpos(); }
+function chOrder(which){ closeSheet(); if(which==='ipos') zaloOpenIpos(); else zaloOpenPartner(which); setTimeout(function(){ toast('Đặt xong? Vào Tích điểm để liên kết hoá đơn nhận điểm.'); }, 700); }
+function openOrderSheet(){
+  $('#sheet-title').textContent='Chọn cách đặt món';
+  $('#sheet-body').innerHTML = `
+    <div class="reward" data-a="chOrder" data-v="ipos" style="cursor:pointer;align-items:center">
+      <div class="ic" style="background:#FFF1E8">🍔</div>
+      <div style="flex:1"><div class="nm">Đặt tại quán / Mang về</div><div class="muted" style="font-size:12px">Qua iPOS Web Order — vào thẳng bếp Bunbun</div></div>
+      <div style="color:var(--ink-soft);font-size:20px">›</div></div>
+    <div class="reward" data-a="chOrder" data-v="grab" style="cursor:pointer;align-items:center">
+      <div class="ic" style="background:#E6F7EE;color:#00B14F;font-weight:800">G</div>
+      <div style="flex:1"><div class="nm">Giao qua GrabFood</div><div class="muted" style="font-size:12px">Tài xế Grab giao tận nơi</div></div>
+      <div style="color:var(--ink-soft);font-size:20px">›</div></div>
+    <div class="reward" data-a="chOrder" data-v="shopee" style="cursor:pointer;align-items:center">
+      <div class="ic" style="background:#FDECE8;color:#EE4D2D;font-weight:800">S</div>
+      <div style="flex:1"><div class="nm">Giao qua ShopeeFood</div><div class="muted" style="font-size:12px">Tài xế ShopeeFood giao tận nơi</div></div>
+      <div style="color:var(--ink-soft);font-size:20px">›</div></div>
+    <div class="pnote" style="margin-top:10px">Bạn chọn món & thanh toán trên kênh tương ứng. Đặt xong nhớ liên kết hoá đơn để tích điểm Bunbun.</div>`;
+  $('#sheet-foot').innerHTML='<button class="btn ghost" data-a="closeSheet">Đóng</button>';
+  showSheet();
+}
+function openItem(id){ if(isSoldout(id)){ toast('Món đang tạm hết'); return; } openOrderSheet(); }
 function itemQty(d){ syncNote(); curQty=Math.max(1,curQty+d); renderItemSheet(); }
 function itemToggle(i){
   syncNote();
@@ -1314,8 +1333,8 @@ renderHome(); render(); bootData();   // bootData(): nếu chưa cấu hình API
 
 
 /* ===== Event delegation (thay onclick "" — hợp CSP Zalo Mini App) ===== */
-var FN={go:go,openPolicy:openPolicy,quickAdd:quickAdd,quickPartner:quickPartner,redeem:redeem,setCat:setCat,setType:setType,openItem:openItem,afterSuccess:afterSuccess,claimIpos:claimIpos,closeHandoff:closeHandoff,closeSheet:closeSheet,confirmAddItem:confirmAddItem,dismissOnb:dismissOnb,iposHandoff:iposHandoff,linkOA:linkOA,openCart:openCart,openCheckout:openCheckout,openOrders:openOrders,openPartner:openPartner,zaloOpenIpos:zaloOpenIpos,openBranches:openBranches,showDebug:showDebug,orderIpos:orderIpos};
-var STR={go:1,openPolicy:1,quickAdd:1,quickPartner:1,redeem:1,setCat:1,setType:1,openItem:1};
+var FN={go:go,openPolicy:openPolicy,quickAdd:quickAdd,quickPartner:quickPartner,redeem:redeem,setCat:setCat,setType:setType,openItem:openItem,afterSuccess:afterSuccess,claimIpos:claimIpos,closeHandoff:closeHandoff,closeSheet:closeSheet,confirmAddItem:confirmAddItem,dismissOnb:dismissOnb,iposHandoff:iposHandoff,linkOA:linkOA,openCart:openCart,openCheckout:openCheckout,openOrders:openOrders,openPartner:openPartner,zaloOpenIpos:zaloOpenIpos,openBranches:openBranches,showDebug:showDebug,openOrderSheet:openOrderSheet,chOrder:chOrder};
+var STR={go:1,openPolicy:1,quickAdd:1,quickPartner:1,redeem:1,setCat:1,setType:1,openItem:1,chOrder:1};
 function onAppClick(e){
   var el=e.target.closest('[data-a]'); if(!el) return;
   var a=el.getAttribute('data-a'), v=el.getAttribute('data-v');
