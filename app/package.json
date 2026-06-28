@@ -9,6 +9,7 @@
     "login": "zmp login"
   },
   "dependencies": {
+    "qrcode-generator": "^2.0.4",
     "zmp-sdk": "latest"
   },
   "devDependencies": {
