@@ -2792,7 +2792,7 @@ var __TPL=`
   </div>
 
   <!-- floating cart (pinned above tab bar) -->
-  <div class="cartbar show" id="orderbar" data-a="openOrderSheet">
+  <div class="cartbar" id="orderbar" data-a="openOrderSheet">
     <div class="t" style="flex:1;text-align:center;font-weight:700;font-size:15px">🍔 Đặt món</div>
     <div class="tot">→</div>
   </div>
@@ -3167,6 +3167,7 @@ window.bootData = bootData;
 function go(v){
   document.querySelectorAll('.view').forEach(e=>e.classList.remove('active'));
   $('#v-'+v).classList.add('active');
+  var __ob=$('#orderbar'); if(__ob) __ob.classList.toggle('show', v==='menu');
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on', t.dataset.v===v));
   $('#screen').scrollTop=0;
   if(v==='loyalty') renderLoyalty();
