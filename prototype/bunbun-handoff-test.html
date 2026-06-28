@@ -998,13 +998,17 @@ function addonsFor(it){
   return ADDONS[it.id]||[];
 }
 let curItem=null, curQty=1, curAddons=[], curNote='';
-function chOrder(which){ closeSheet(); if(which==='ipos') zaloOpenIpos(); else zaloOpenPartner(which); setTimeout(function(){ toast('Đặt xong? Vào Tích điểm để liên kết hoá đơn nhận điểm.'); }, 700); }
+function chOrder(which){ closeSheet(); if(which==='dinein'||which==='takeaway') zaloOpenIpos(); else zaloOpenPartner(which); setTimeout(function(){ toast('Đặt xong? Vào Tích điểm để liên kết hoá đơn nhận điểm.'); }, 700); }
 function openOrderSheet(){
   $('#sheet-title').textContent='Chọn cách đặt món';
   $('#sheet-body').innerHTML = `
-    <div class="reward" data-a="chOrder" data-v="ipos" style="cursor:pointer;align-items:center">
-      <div class="ic" style="background:#FFF1E8">🍔</div>
-      <div style="flex:1"><div class="nm">Đặt tại quán / Mang về</div><div class="muted" style="font-size:12px">Qua iPOS Web Order — vào thẳng bếp Bunbun</div></div>
+    <div class="reward" data-a="chOrder" data-v="dinein" style="cursor:pointer;align-items:center">
+      <div class="ic" style="background:#FFF1E8">🍽️</div>
+      <div style="flex:1"><div class="nm">Đặt tại quán</div><div class="muted" style="font-size:12px">Qua iPOS — đơn vào thẳng bếp & hoá đơn tại quán</div></div>
+      <div style="color:var(--ink-soft);font-size:20px">›</div></div>
+    <div class="reward" data-a="chOrder" data-v="takeaway" style="cursor:pointer;align-items:center">
+      <div class="ic" style="background:#FFF1E8">🥡</div>
+      <div style="flex:1"><div class="nm">Mang về</div><div class="muted" style="font-size:12px">Qua iPOS — chọn hình thức mang về, lấy tại quầy</div></div>
       <div style="color:var(--ink-soft);font-size:20px">›</div></div>
     <div class="reward" data-a="chOrder" data-v="grab" style="cursor:pointer;align-items:center">
       <div class="ic" style="background:#E6F7EE;color:#00B14F;font-weight:800">G</div>
