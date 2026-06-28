@@ -106,7 +106,8 @@ const $ = s => document.querySelector(s);
 let model = [];   // [{cat, icon, items:[{id,nm,ds,pr,hot,status}]}]
 
 /* ---- cấu hình lưu localStorage ---- */
-function cfg(){ return { base:(localStorage.getItem('bb_admin_base')||'').replace(/\/$/,''), token:localStorage.getItem('bb_admin_token')||'' }; }
+const API_DEFAULT='https://vmmjvkotttbxoyforxgh.functions.supabase.co';
+function cfg(){ return { base:(localStorage.getItem('bb_admin_base')||API_DEFAULT).replace(/\/$/,''), token:localStorage.getItem('bb_admin_token')||'' }; }
 function saveCfg(){
   localStorage.setItem('bb_admin_base', $('#cfg-base').value.trim());
   localStorage.setItem('bb_admin_token', $('#cfg-token').value.trim());

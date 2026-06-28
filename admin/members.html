@@ -98,7 +98,8 @@ td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;}
 const $ = s => document.querySelector(s);
 let members = [];
 
-function cfg(){ return { base:(localStorage.getItem('bb_admin_base')||'').replace(/\/$/,''), token:localStorage.getItem('bb_admin_token')||'' }; }
+const API_DEFAULT='https://vmmjvkotttbxoyforxgh.functions.supabase.co';
+function cfg(){ return { base:(localStorage.getItem('bb_admin_base')||API_DEFAULT).replace(/\/$/,''), token:localStorage.getItem('bb_admin_token')||'' }; }
 function saveCfg(){ localStorage.setItem('bb_admin_base',$('#cfg-base').value.trim()); localStorage.setItem('bb_admin_token',$('#cfg-token').value.trim()); toast('Đã lưu cấu hình'); }
 function restoreCfg(){ const c=cfg(); $('#cfg-base').value=c.base; $('#cfg-token').value=c.token; }
 function toast(m,err){ const t=$('#toast'); t.textContent=m; t.className='toast show'+(err?' err':''); clearTimeout(t._t); t._t=setTimeout(()=>t.className='toast',2600); }
