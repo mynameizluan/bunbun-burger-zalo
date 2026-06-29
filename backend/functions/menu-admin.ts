@@ -13,7 +13,18 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-const ADMIN_TOKEN = Deno.env.get("ADMIN_TOKEN") ?? "";
+const ENV_TOKEN = Deno.env.get("ADMIN_TOKEN") ?? "";   // khoá chủ (khôi phục)
+async function passHash(s: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("bbsalt:" + s));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+async function verifyAdmin(incoming: string | null): Promise<boolean> {
+  if (!incoming) return false;
+  if (ENV_TOKEN && incoming === ENV_TOKEN) return true;
+  const { data } = await sb.from("sync_state").select("last_error").eq("job", "__admin_pass__").maybeSingle();
+  const h = (data?.last_error as string) || "";
+  return !!h && (await passHash(incoming)) === h;
+}
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -45,8 +56,8 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
 
   // --- Xác thực admin ---
-  if (!ADMIN_TOKEN || req.headers.get("x-admin-token") !== ADMIN_TOKEN) {
-    return json({ error: "Sai hoặc thiếu admin token" }, 401);
+  if (!(await verifyAdmin(req.headers.get("x-admin-token")))) {
+    return json({ error: "Sai mật khẩu quản trị" }, 401);
   }
 
   try {

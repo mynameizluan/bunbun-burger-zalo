@@ -70,10 +70,11 @@ input:focus,select:focus{outline:none;border-color:var(--orange);}
     <h3>Kết nối</h3>
     <div class="row2">
       <div class="fld"><label>API base (Supabase Functions)</label><input id="cfg-base" placeholder="https://<ref>.functions.supabase.co"></div>
-      <div class="fld"><label>Admin token</label><input id="cfg-token" type="password" placeholder="ADMIN_TOKEN trong .env"></div>
+      <div class="fld"><label>Mật khẩu</label><input id="cfg-token" type="password" placeholder="Mật khẩu quản trị" autocomplete="current-password"></div>
     </div>
     <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
       <button class="btn ghost" onclick="saveCfg()">Lưu cấu hình</button>
+      <button class="btn ghost" onclick="changePass()">Đổi mật khẩu</button>
       <button class="btn ghost" onclick="loadCurrent()">Tải menu hiện tại</button>
       <span class="muted" id="conn-state" style="align-self:center"></span>
     </div>
@@ -114,6 +115,16 @@ function saveCfg(){
   toast('Đã lưu cấu hình trên máy này');
 }
 function restoreCfg(){ const c=cfg(); $('#cfg-base').value=c.base; $('#cfg-token').value=c.token; }
+function changePass(){
+  const c=cfg(); if(!c.base||!c.token){ toast('Đăng nhập (lưu mật khẩu) trước', true); return; }
+  const np=prompt('Nhập mật khẩu mới (tối thiểu 4 ký tự):'); if(np===null) return;
+  if(np.length<4){ toast('Mật khẩu quá ngắn', true); return; }
+  if(prompt('Gõ lại mật khẩu mới để xác nhận:')!==np){ toast('Hai lần nhập không khớp', true); return; }
+  fetch(c.base+'/admin-auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'change',oldPassword:c.token,newPassword:np})})
+    .then(r=>r.json().then(j=>{ if(!r.ok) throw new Error(j.error||('HTTP '+r.status)); return j; }))
+    .then(()=>{ localStorage.setItem('bb_admin_token',np); restoreCfg(); toast('Đã đổi mật khẩu ✓'); })
+    .catch(e=>toast('Lỗi: '+e.message, true));
+}
 
 function toast(msg, err){ const t=$('#toast'); t.textContent=msg; t.className='toast show'+(err?' err':''); clearTimeout(t._t); t._t=setTimeout(()=>t.className='toast',2600); }
 
