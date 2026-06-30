@@ -3657,9 +3657,24 @@ function renderLoyalty(){
 }
 function redeem(id){
   const r=REWARDS.find(x=>x.id===id);
-  if(state.points<r.co) return;
-  state.points-=r.co; addHist('🎁','Đổi: '+r.nm,-r.co);
-  render(); toast('Đã đổi: '+r.nm);
+  if(!r) return;
+  if(!state.memberPhone){ toast('Liên kết SĐT trước để đổi quà', true); linkPhone(); return; }
+  if(state.points<r.co){ toast('Chưa đủ điểm để đổi quà này', true); return; }
+  var q=loyaltyQR();
+  $('#sheet-title').textContent='Đổi quà tại quầy';
+  $('#sheet-body').innerHTML =
+    '<div style="text-align:center">'
+    + '<div style="font-size:34px;line-height:1;margin-bottom:6px">'+(r.ic||'🎁')+'</div>'
+    + '<div style="font-weight:700;font-size:16px">'+r.nm+'</div>'
+    + '<div class="muted" style="font-size:12.5px;margin-bottom:14px">Cần '+r.co+' điểm · bạn đang có '+state.points.toLocaleString("vi-VN")+' điểm</div>'
+    + '<div style="display:inline-block;padding:16px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)">'
+    + '<img src="'+q.url+'" alt="QR đổi quà" style="width:200px;height:200px;display:block;image-rendering:pixelated">'
+    + '</div>'
+    + '<div class="muted" style="font-size:12px;margin-top:10px;letter-spacing:.05em">'+q.code+'</div>'
+    + '<div class="pnote" style="margin-top:14px;text-align:left">Đưa mã này cho <b>nhân viên Bunbun</b> để đổi <b>'+r.nm+'</b>. Nhân viên xác nhận &amp; trừ điểm tại quầy.</div>'
+    + '</div>';
+  $('#sheet-foot').innerHTML='<button class="btn ghost" data-a="closeSheet">Đóng</button>';
+  showSheet();
 }
 function addHist(ic,t,v){
   const d=new Date();
