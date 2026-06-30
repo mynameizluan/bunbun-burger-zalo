@@ -3053,7 +3053,7 @@ let MENU = [
   ]},
 ];
 
-const REWARDS = [
+let REWARDS = [
   {id:"r1", ic:"💸", nm:"Giảm 20.000đ", co:100},
   {id:"r2", ic:"🍟", nm:"Khoai tây miễn phí", co:150},
   {id:"r3", ic:"🥤", nm:"Nước uống miễn phí", co:120},
@@ -3093,6 +3093,7 @@ function lsSet(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(_){
 function applyMenuPayload(j){
   if(!j || !Array.isArray(j.groups) || !j.groups.length) return false;
   MENU = j.groups;
+  if(Array.isArray(j.rewards) && j.rewards.length) REWARDS = j.rewards;
   menuMeta = { version:j.version ?? null, updatedAt:j.updatedAt || Date.now(), source:'api' };
   return true;
 }

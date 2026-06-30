@@ -90,6 +90,12 @@ input:focus,select:focus{outline:none;border-color:var(--orange);}
   <div id="groups"></div>
 
   <div style="text-align:center;margin-top:8px"><button class="btn ghost" onclick="addGroup()">+ Thêm nhóm</button></div>
+
+  <div class="grp" style="margin-top:18px">
+    <div class="grphead"><div class="fld"><div style="font-weight:700;font-size:15px">🎁 Quà đổi điểm</div><div class="muted" style="font-size:12px">Khách dùng điểm tích lũy để đổi các quà này</div></div></div>
+    <div id="rewards-editor"></div>
+    <div style="margin-top:10px"><button class="btn ghost sm" onclick="addReward()">+ Thêm quà</button></div>
+  </div>
 </div>
 
 <div class="savebar">
@@ -105,6 +111,25 @@ const SEED = [{"cat":"Burger","icon":"🍔","items":[{"id":"b1","nm":"Burger Bò
 
 const $ = s => document.querySelector(s);
 let model = [];   // [{cat, icon, items:[{id,nm,ds,pr,hot,status}]}]
+let rewards = [
+  {id:'r1', ic:'💸', nm:'Giảm 20.000đ', co:100},
+  {id:'r2', ic:'🍟', nm:'Khoai tây miễn phí', co:150},
+  {id:'r3', ic:'🥤', nm:'Nước uống miễn phí', co:120},
+  {id:'r4', ic:'🍔', nm:'Burger gà sốt cay miễn phí', co:300}
+];
+function renderRewards(){
+  const el=$('#rewards-editor'); if(!el) return;
+  el.innerHTML = rewards.map((r,i)=>`
+    <div class="item-wrap"><div style="display:grid;grid-template-columns:56px 1fr 120px 36px;gap:8px;align-items:center">
+      <input value="${esc(r.ic||'')}" oninput="setReward(${i},'ic',this.value)" placeholder="🎁" style="text-align:center">
+      <input value="${esc(r.nm||'')}" oninput="setReward(${i},'nm',this.value)" placeholder="Tên quà (vd: Giảm 20.000đ)">
+      <input type="number" min="0" step="10" value="${Number(r.co)||0}" oninput="setReward(${i},'co',Number(this.value)||0)" placeholder="Điểm">
+      <button class="x" title="Xoá quà" onclick="delReward(${i})">✕</button>
+    </div></div>`).join('') || '<div class="muted" style="padding:8px">Chưa có quà nào. Bấm “Thêm quà”.</div>';
+}
+function setReward(i,k,v){ rewards[i][k]=v; }
+function addReward(){ rewards.push({id:'rw'+Date.now().toString(36), ic:'🎁', nm:'', co:100}); renderRewards(); }
+function delReward(i){ rewards.splice(i,1); renderRewards(); }
 
 /* ---- cấu hình lưu localStorage ---- */
 const API_DEFAULT='https://vmmjvkotttbxoyforxgh.functions.supabase.co';
@@ -143,6 +168,7 @@ async function loadCurrent(){
     const j=await r.json();
     if(!j.groups||!j.groups.length){ $('#conn-state').textContent='Chưa có menu trên server — bấm “Nạp menu mẫu”.'; model=[]; render(); return; }
     model = j.groups.map(g=>({ cat:g.cat, icon:g.icon||'🍽️', items:normItems(g.items, j.availability) }));
+    if(Array.isArray(j.rewards)&&j.rewards.length) rewards=j.rewards.map(r=>({id:r.id,ic:r.ic,nm:r.nm,co:Number(r.co)||0}));
     $('#save-info').textContent='Phiên bản hiện tại: '+(j.version||'—')+(j.updatedAt?(' · '+new Date(j.updatedAt).toLocaleString('vi-VN')):'');
     $('#conn-state').textContent='Đã tải menu hiện tại ✓';
     render(); toast('Đã tải menu hiện tại từ Supabase');
@@ -187,6 +213,7 @@ function render(){
         </div>`).join('')}
       <div style="margin-top:10px"><button class="btn ghost sm" onclick="addItem(${gi})">+ Thêm món</button></div>
     </div>`).join('') || '<div class="muted" style="text-align:center;padding:30px">Chưa có nhóm nào. Bấm “Nạp menu mẫu Bunbun” hoặc “Thêm nhóm”.</div>';
+  renderRewards();
 }
 
 /* ---- validate + gửi lên Supabase ---- */
@@ -194,7 +221,8 @@ function buildPayload(){
   const groups = model.map(g=>({ cat:g.cat.trim(), icon:g.icon, items:g.items.map(it=>{ const o={ id:it.id.trim(), nm:it.nm.trim(), ds:it.ds, pr:Number(it.pr)||0, hot:!!it.hot }; if(it.photo&&it.photo.trim()) o.photo=it.photo.trim(); return o; }) }));
   const availability = {};
   model.forEach(g=>g.items.forEach(it=>{ if(it.status&&it.status!=='available') availability[it.id.trim()]=it.status; else availability[it.id.trim()]='available'; }));
-  return { groups, availability };
+  const rw = rewards.filter(r=>(r.nm||'').trim()).map((r,i)=>({ id:r.id||('rw'+i), ic:r.ic||'🎁', nm:r.nm.trim(), co:Number(r.co)||0 }));
+  return { groups, rewards: rw, availability };
 }
 function validate(){
   const ids=new Set();

@@ -70,6 +70,7 @@ Deno.serve(async (req) => {
         version: mc?.version ?? null,
         updatedAt: mc?.updated_at ?? null,
         groups: (mc?.data as any)?.groups ?? [],
+        rewards: (mc?.data as any)?.rewards ?? [],
         availability,
       });
     }
@@ -80,7 +81,13 @@ Deno.serve(async (req) => {
       const err = validateGroups(groups);
       if (err) return json({ error: err }, 400);
 
-      const data = { groups };
+      // rewards (quà đổi điểm): lấy từ body; nếu không gửi thì giữ nguyên cái hiện có
+      let rewards = Array.isArray(body?.rewards) ? body.rewards : null;
+      if (!rewards) {
+        const { data: cur } = await sb.from("menu_cache").select("data").eq("id", 1).maybeSingle();
+        rewards = (cur?.data as any)?.rewards ?? [];
+      }
+      const data = { groups, rewards };
       const version = await sha(JSON.stringify(data));
       const { error: e1 } = await sb.from("menu_cache").upsert({
         id: 1, version, data, updated_at: new Date().toISOString(),
