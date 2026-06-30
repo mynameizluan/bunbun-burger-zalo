@@ -3062,7 +3062,9 @@ const REWARDS = [
 const RANKS=[{n:"🥉 Hạng Đồng",min:0},{n:"🥈 Hạng Bạc",min:200},{n:"🥇 Hạng Vàng",min:500},{n:"💎 Hạng Kim Cương",min:1000}];
 
 /* ============== STATE ============== */
-let state = { points:0, stamps:0, lines:[], history:[], orderNo:124, orders:0, pendingOrder:null, orderList:[] };
+function lsStr(k){ try{ return localStorage.getItem(k)||''; }catch(_){ return ''; } }
+function lsSetStr(k,v){ try{ localStorage.setItem(k,v); }catch(_){} }
+let state = { points:0, stamps:0, lines:[], history:[], orderNo:124, orders:0, pendingOrder:null, orderList:[], memberPhone:lsStr('bb_member_phone'), memberName:lsStr('bb_member_name') };
 const fmt = n => n.toLocaleString('vi-VN')+"đ";
 const $ = s => document.querySelector(s);
 
@@ -3159,6 +3161,37 @@ async function syncMemberPoints(action='get', amount=0, orderNo){
   }catch(e){ console.warn('[Bunbun] /crm-points lỗi:', e.message); }
 }
 
+
+/* ===== Hội viên (liên kết SĐT — $0, không cần App Secret) ===== */
+async function memberGet(body){
+  const base=apiBase(); if(!base) return null;
+  try{ return await fetch(base+'/crm-points',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(x=>x.json()); }
+  catch(e){ console.warn('[Bunbun] crm-points lỗi:',e.message); return null; }
+}
+function applyMember(r){
+  if(!r||!r.ok) return false;
+  state.memberPhone=r.phone||state.memberPhone;
+  if(r.name) state.memberName=r.name;
+  if(typeof r.points==='number') state.points=r.points;
+  if(typeof r.stamps==='number') state.stamps=r.stamps;
+  lsSetStr('bb_member_phone', state.memberPhone||'');
+  if(state.memberName) lsSetStr('bb_member_name', state.memberName);
+  return true;
+}
+async function linkPhone(){
+  const ph=prompt('Nhập số điện thoại để tích điểm Bunbun:'); if(ph===null) return;
+  let nm=state.memberName||'';
+  if(!nm){ nm=prompt('Tên của bạn (để nhân viên dễ nhận):')||''; }
+  const r=await memberGet({action:'get', phone:ph, name:nm});
+  if(!r){ toast('Lỗi mạng, thử lại', true); return; }
+  if(r.error){ toast(r.error, true); return; }
+  if(applyMember(r)){ render(); toast('Đã liên kết SĐT ✓'); showLoyaltyQR(); }
+}
+async function refreshMember(){
+  if(!state.memberPhone) return;
+  if(applyMember(await memberGet({action:'get', phone:state.memberPhone}))) render();
+}
+
 /* Khởi động nạp dữ liệu backend; module bootstrap gọi lại khi window.Zalo sẵn sàng. */
 function bootData(){ fetchMenu(); fetchAvailability(); }
 window.bootData = bootData;
@@ -3170,7 +3203,7 @@ function go(v){
   var __ob=$('#orderbar'); if(__ob) __ob.classList.toggle('show', v==='menu');
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on', t.dataset.v===v));
   $('#screen').scrollTop=0;
-  if(v==='loyalty') renderLoyalty();
+  if(v==='loyalty'){ renderLoyalty(); refreshMember(); }
 }
 
 /* ============== CẦU NỐI ZALO SDK (Prompt 2) ==============
@@ -3433,12 +3466,13 @@ function loyaltyQR(){
   return { url: qr.createDataURL(7,4), code: code, phone: phone };
 }
 function showLoyaltyQR(){
+  if(!state.memberPhone){ linkPhone(); return; }
   var q = loyaltyQR();
   var rank = rankOf(state.points).n;
   $('#sheet-title').textContent='Thẻ tích điểm Bunbun';
   $('#sheet-body').innerHTML =
     '<div style="text-align:center">'
-    + '<div style="font-weight:700;font-size:15px">Thành viên Bunbun</div>'
+    + '<div style="font-weight:700;font-size:15px">'+(state.memberName||'Thành viên Bunbun')+'</div>'
     + '<div class="muted" style="font-size:12.5px;margin-bottom:14px">'+rank+' · '+state.points.toLocaleString("vi-VN")+' điểm</div>'
     + '<div style="display:inline-block;padding:16px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)">'
     + '<img src="'+q.url+'" alt="QR tích điểm" style="width:210px;height:210px;display:block;image-rendering:pixelated">'
@@ -3598,14 +3632,15 @@ function rankOf(p){ let r=RANKS[0]; RANKS.forEach(x=>{if(p>=x.min)r=x;}); return
 function renderLoyalty(){
   $('#loy-pts').textContent=state.points.toLocaleString('vi-VN');
   $('#loy-rank').textContent=rankOf(state.points).n;
-  const o=state.pendingOrder;
-  $('#ipos-claim').innerHTML = o ? `
+  const __who=$('#v-loyalty .member .who'); if(__who) __who.textContent = state.memberName ? ('Chào, '+state.memberName) : 'Thẻ thành viên Bunbun';
+  const __sub=$('#v-loyalty .member .sub'); if(__sub) __sub.textContent = state.memberPhone ? ('SĐT '+state.memberPhone+' · liên kết Zalo OA') : 'Liên kết SĐT để bắt đầu tích điểm';
+  $('#ipos-claim').innerHTML = state.memberPhone ? '' : `
     <div class="claimcard">
-      <div class="cic">🧾</div>
-      <div style="flex:1"><div style="font-weight:700;font-size:13.5px">Hoá đơn iPOS ${o.no} vừa đặt</div>
-        <div style="font-size:11.5px;color:var(--ink-soft)">${fmt(o.total)} · liên kết để nhận +${o.pts} điểm${o.big?' · +1 tem':''}</div></div>
-      <button class="cbtn" data-a="claimIpos">Liên kết</button>
-    </div>` : '';
+      <div class="cic">📱</div>
+      <div style="flex:1"><div style="font-weight:700;font-size:13.5px">Liên kết số điện thoại</div>
+        <div style="font-size:11.5px;color:var(--ink-soft)">Để tích điểm &amp; đổi quà tại Bunbun</div></div>
+      <button class="cbtn" data-a="linkPhone">Liên kết</button>
+    </div>`;
   $('#stamp-txt').textContent=state.stamps+'/10';
   $('#stamps').innerHTML = Array.from({length:10},(_,i)=>`<div class="stamp ${i<state.stamps?'fill':''}"></div>`).join('');
   $('#rewards').innerHTML = REWARDS.map(r=>`
@@ -3656,7 +3691,7 @@ renderHome(); render(); bootData();   // bootData(): nếu chưa cấu hình API
 
 
 /* ===== Event delegation (thay onclick "" — hợp CSP Zalo Mini App) ===== */
-var FN={go:go,openPolicy:openPolicy,quickAdd:quickAdd,quickPartner:quickPartner,redeem:redeem,setCat:setCat,setType:setType,openItem:openItem,afterSuccess:afterSuccess,claimIpos:claimIpos,closeHandoff:closeHandoff,closeSheet:closeSheet,confirmAddItem:confirmAddItem,dismissOnb:dismissOnb,iposHandoff:iposHandoff,linkOA:linkOA,openCart:openCart,openCheckout:openCheckout,openOrders:openOrders,openPartner:openPartner,zaloOpenIpos:zaloOpenIpos,openBranches:openBranches,showDebug:showDebug,openOrderSheet:openOrderSheet,chOrder:chOrder,showLoyaltyQR:showLoyaltyQR};
+var FN={go:go,openPolicy:openPolicy,quickAdd:quickAdd,quickPartner:quickPartner,redeem:redeem,setCat:setCat,setType:setType,openItem:openItem,afterSuccess:afterSuccess,claimIpos:claimIpos,closeHandoff:closeHandoff,closeSheet:closeSheet,confirmAddItem:confirmAddItem,dismissOnb:dismissOnb,iposHandoff:iposHandoff,linkOA:linkOA,openCart:openCart,openCheckout:openCheckout,openOrders:openOrders,openPartner:openPartner,zaloOpenIpos:zaloOpenIpos,openBranches:openBranches,showDebug:showDebug,openOrderSheet:openOrderSheet,chOrder:chOrder,showLoyaltyQR:showLoyaltyQR,linkPhone:linkPhone};
 var STR={go:1,openPolicy:1,quickAdd:1,quickPartner:1,redeem:1,setCat:1,setType:1,openItem:1,chOrder:1};
 function onAppClick(e){
   var el=e.target.closest('[data-a]'); if(!el) return;
