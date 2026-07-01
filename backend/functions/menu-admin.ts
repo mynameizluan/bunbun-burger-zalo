@@ -71,6 +71,7 @@ Deno.serve(async (req) => {
         updatedAt: mc?.updated_at ?? null,
         groups: (mc?.data as any)?.groups ?? [],
         rewards: (mc?.data as any)?.rewards ?? [],
+        banner: (mc?.data as any)?.banner ?? null,
         availability,
       });
     }
@@ -83,11 +84,14 @@ Deno.serve(async (req) => {
 
       // rewards (quà đổi điểm): lấy từ body; nếu không gửi thì giữ nguyên cái hiện có
       let rewards = Array.isArray(body?.rewards) ? body.rewards : null;
-      if (!rewards) {
+      // banner (ảnh hero): "banner" là chuỗi URL → dùng; "" → xoá (app dùng ảnh mặc định); không gửi → giữ nguyên
+      let banner = typeof body?.banner === "string" ? body.banner.trim() : undefined;
+      if (!rewards || banner === undefined) {
         const { data: cur } = await sb.from("menu_cache").select("data").eq("id", 1).maybeSingle();
-        rewards = (cur?.data as any)?.rewards ?? [];
+        if (!rewards) rewards = (cur?.data as any)?.rewards ?? [];
+        if (banner === undefined) banner = (cur?.data as any)?.banner ?? "";
       }
-      const data = { groups, rewards };
+      const data = { groups, rewards, banner };
       const version = await sha(JSON.stringify(data));
       const { error: e1 } = await sb.from("menu_cache").upsert({
         id: 1, version, data, updated_at: new Date().toISOString(),

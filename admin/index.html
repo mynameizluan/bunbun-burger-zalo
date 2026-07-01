@@ -87,6 +87,12 @@ input:focus,select:focus{outline:none;border-color:var(--orange);}
     <span class="muted" id="count"></span>
   </div>
 
+  <div class="grp" style="margin-bottom:16px">
+    <div class="grphead"><div class="fld"><div style="font-weight:700;font-size:15px">🖼️ Ảnh banner trang chủ</div><div class="muted" style="font-size:12px">Dán link ảnh (https://…) — ảnh hero ở đầu trang chủ app. Để trống = dùng ảnh mặc định. Tỉ lệ ngang đẹp ~ 5:1.</div></div></div>
+    <input id="banner-url" placeholder="https://… link ảnh banner" oninput="onBannerInput()">
+    <img id="banner-preview" alt="Xem trước banner" style="display:none;width:100%;max-height:160px;object-fit:cover;border-radius:12px;border:1px solid var(--line);margin-top:10px">
+  </div>
+
   <div id="groups"></div>
 
   <div style="text-align:center;margin-top:8px"><button class="btn ghost" onclick="addGroup()">+ Thêm nhóm</button></div>
@@ -128,6 +134,12 @@ function renderRewards(){
     </div></div>`).join('') || '<div class="muted" style="padding:8px">Chưa có quà nào. Bấm “Thêm quà”.</div>';
 }
 function setReward(i,k,v){ rewards[i][k]=v; }
+let banner='';
+function onBannerInput(){
+  banner=($('#banner-url').value||'').trim();
+  const img=$('#banner-preview');
+  if(banner){ img.src=banner; img.style.display='block'; } else { img.style.display='none'; }
+}
 function addReward(){ rewards.push({id:'rw'+Date.now().toString(36), ic:'🎁', nm:'', co:100}); renderRewards(); }
 function delReward(i){ rewards.splice(i,1); renderRewards(); }
 
@@ -169,6 +181,7 @@ async function loadCurrent(){
     if(!j.groups||!j.groups.length){ $('#conn-state').textContent='Chưa có menu trên server — bấm “Nạp menu mẫu”.'; model=[]; render(); return; }
     model = j.groups.map(g=>({ cat:g.cat, icon:g.icon||'🍽️', items:normItems(g.items, j.availability) }));
     if(Array.isArray(j.rewards)&&j.rewards.length) rewards=j.rewards.map(r=>({id:r.id,ic:r.ic,nm:r.nm,co:Number(r.co)||0}));
+    banner=(typeof j.banner==='string')?j.banner:''; if($('#banner-url')){ $('#banner-url').value=banner; onBannerInput(); }
     $('#save-info').textContent='Phiên bản hiện tại: '+(j.version||'—')+(j.updatedAt?(' · '+new Date(j.updatedAt).toLocaleString('vi-VN')):'');
     $('#conn-state').textContent='Đã tải menu hiện tại ✓';
     render(); toast('Đã tải menu hiện tại từ Supabase');
@@ -222,7 +235,7 @@ function buildPayload(){
   const availability = {};
   model.forEach(g=>g.items.forEach(it=>{ if(it.status&&it.status!=='available') availability[it.id.trim()]=it.status; else availability[it.id.trim()]='available'; }));
   const rw = rewards.filter(r=>(r.nm||'').trim()).map((r,i)=>({ id:r.id||('rw'+i), ic:r.ic||'🎁', nm:r.nm.trim(), co:Number(r.co)||0 }));
-  return { groups, rewards: rw, availability };
+  return { groups, rewards: rw, banner:(banner||'').trim(), availability };
 }
 function validate(){
   const ids=new Set();
