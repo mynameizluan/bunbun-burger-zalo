@@ -38,11 +38,22 @@ const CORS = {
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...CORS, "Content-Type": "application/json" } });
 
-function tierOf(p: number): string {
-  if (p >= 1000) return "Kim Cương";
-  if (p >= 500) return "Vàng";
-  if (p >= 200) return "Bạc";
-  return "Đồng";
+// Đọc cấu hình điểm (rate đ/điểm, tem, hạng) từ menu_cache.data.loyalty
+async function loadLoyalty(): Promise<any> {
+  const { data } = await sb.from("menu_cache").select("data").eq("id", 1).maybeSingle();
+  const c = (data?.data as any)?.loyalty || {};
+  return {
+    vndPerPoint: Number(c.vndPerPoint) || 1000,
+    stampPerOrder: Number(c.stampPerOrder ?? 1),
+    stampGoal: Number(c.stampGoal ?? 10),
+    tiers: Array.isArray(c.tiers) && c.tiers.length ? c.tiers
+      : [{ n: "Đồng", min: 0 }, { n: "Bạc", min: 200 }, { n: "Vàng", min: 500 }, { n: "Kim Cương", min: 1000 }],
+  };
+}
+function tierOfCfg(p: number, tiers: any[]): string {
+  let t = "Đồng";
+  for (const x of [...tiers].sort((a, b) => a.min - b.min)) if (p >= x.min) t = x.n;
+  return t;
 }
 
 Deno.serve(async (req) => {
@@ -84,8 +95,9 @@ Deno.serve(async (req) => {
       if (action === "adjust") {
         const delta = Number(body.pointsDelta);
         if (!delta || Number.isNaN(delta)) return json({ error: "pointsDelta không hợp lệ" }, 400);
+        const cfg = await loadLoyalty();
         const points = Math.max(0, (m.points ?? 0) + delta);
-        const tier = tierOf(points);
+        const tier = tierOfCfg(points, cfg.tiers);
         const { error: e1 } = await sb.from("members").update({ points, tier }).eq("id", memberId);
         if (e1) return json({ error: e1.message }, 500);
         await sb.from("point_txns").insert({
@@ -95,6 +107,25 @@ Deno.serve(async (req) => {
           note: (body.note ? String(body.note) : (delta >= 0 ? "Cộng tay (admin)" : "Đổi quà/trừ tay (admin)")).slice(0, 200),
         });
         return json({ ok: true, points, tier });
+      }
+
+      // Quét QR + nhập tiền đơn → tự tính điểm theo rate quản lý đặt (chống lạm dụng: nhân viên KHÔNG nhập điểm)
+      if (action === "accrue") {
+        const amount = Math.round(Number(body.amountVnd));
+        if (!amount || amount <= 0 || Number.isNaN(amount)) return json({ error: "Số tiền đơn không hợp lệ" }, 400);
+        const cfg = await loadLoyalty();
+        const add = Math.floor(amount / cfg.vndPerPoint);        // vd 200.000đ ÷ 1.000 = 200 điểm
+        const points = (m.points ?? 0) + add;
+        const stamps = (m.stamps ?? 0) + cfg.stampPerOrder;
+        const tier = tierOfCfg(points, cfg.tiers);
+        const { error: e1 } = await sb.from("members").update({ points, tier, stamps }).eq("id", memberId);
+        if (e1) return json({ error: e1.message }, 500);
+        await sb.from("point_txns").insert({
+          member_id: memberId, txn_type: "accrue", amount: add,
+          ref_order_no: body.orderNo ? String(body.orderNo).slice(0, 40) : null,
+          note: `Đơn ${amount.toLocaleString("vi-VN")}đ · +${add} điểm` + (cfg.stampPerOrder ? ` · +${cfg.stampPerOrder} tem` : ""),
+        });
+        return json({ ok: true, addedPoints: add, points, tier, stamps, amount, stampGoal: cfg.stampGoal });
       }
 
       if (action === "redeemStamp") {

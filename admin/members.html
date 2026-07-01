@@ -86,8 +86,14 @@ body.locked{overflow:hidden;}
     <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
       <button class="btn ghost" onclick="saveCfg()">Lưu cấu hình</button>
       <button class="btn ghost" onclick="changePass()">Đổi mật khẩu</button>
+      <button class="btn ghost" onclick="openCfg()">⚙️ Cấu hình điểm (Quản lý)</button>
       <span class="muted" id="conn-state" style="align-self:center"></span>
     </div>
+  </div>
+
+  <div class="bar" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+    <button class="btn" onclick="openScan()" style="background:#1F9E55;font-size:15px;padding:12px 18px">📷 Quét QR cộng điểm</button>
+    <span class="muted" id="loy-hint">Quét QR khách → nhập tiền đơn → tự cộng điểm.</span>
   </div>
 
   <div class="bar">
@@ -112,8 +118,61 @@ body.locked{overflow:hidden;}
   <div style="text-align:right;margin-top:12px"><button class="btn ghost" onclick="closeModal()">Đóng</button></div>
 </div>
 
+<!-- Modal QUÉT QR cộng điểm -->
+<div class="scrim" id="scanScrim" onclick="closeScan()"></div>
+<div class="modal" id="scanModal">
+  <h3>Quét QR cộng điểm</h3>
+  <div id="scan-cam">
+    <div style="position:relative;background:#000;border-radius:12px;overflow:hidden;aspect-ratio:1/1;max-width:320px;margin:0 auto">
+      <video id="scan-video" playsinline muted style="width:100%;height:100%;object-fit:cover"></video>
+      <div style="position:absolute;inset:16%;border:3px solid #1F9E55;border-radius:14px;box-shadow:0 0 0 1000px rgba(0,0,0,.25)"></div>
+    </div>
+    <div class="muted" id="scan-msg" style="text-align:center;margin-top:10px">Chĩa camera vào mã QR của khách…</div>
+  </div>
+  <div id="scan-form" style="display:none">
+    <div style="background:var(--cream);border-radius:12px;padding:12px;margin-bottom:12px">
+      <div>Khách: <b id="scan-phone"></b> <span class="muted" id="scan-name"></span></div>
+      <div class="muted" id="scan-cur" style="font-size:12.5px;margin-top:2px"></div>
+    </div>
+    <label>Tổng tiền đơn (đ)</label>
+    <input id="scan-amount" type="number" inputmode="numeric" placeholder="VD: 200000" oninput="scanPreview()">
+    <div id="scan-preview" style="color:var(--green);font-weight:600;font-size:14px;margin:8px 0"></div>
+    <label>Mã đơn (tuỳ chọn)</label>
+    <input id="scan-order" placeholder="VD: HD001">
+    <button class="btn" style="width:100%;margin-top:12px;background:#1F9E55" onclick="scanAccrue()">Cộng điểm cho khách</button>
+  </div>
+  <div style="text-align:right;margin-top:12px"><button class="btn ghost" onclick="closeScan()">Đóng</button></div>
+</div>
+<canvas id="scan-canvas" style="display:none"></canvas>
+
+<!-- Modal CẤU HÌNH ĐIỂM (cần mật khẩu quản lý) -->
+<div class="scrim" id="cfgScrim" onclick="closeCfg()"></div>
+<div class="modal" id="cfgModal">
+  <h3>⚙️ Cấu hình điểm thưởng</h3>
+  <div class="muted" style="margin-bottom:12px">Chỉ quản lý đổi được. Áp dụng ngay cho lần quét QR tiếp theo.</div>
+  <label>Bao nhiêu ĐỒNG = 1 điểm</label>
+  <input id="cfg-vpp" type="number" inputmode="numeric" placeholder="1000">
+  <div class="row2" style="margin-top:10px">
+    <div class="fld"><label>Tem cộng mỗi đơn</label><input id="cfg-spo" type="number" placeholder="1"></div>
+    <div class="fld"><label>Số tem đổi 1 burger</label><input id="cfg-goal" type="number" placeholder="10"></div>
+  </div>
+  <label style="margin-top:12px">Hạng (tên · điểm tối thiểu)</label>
+  <div id="cfg-tiers" style="display:grid;gap:8px">
+    <div class="row2"><div class="fld"><input id="cfg-tn0" placeholder="Đồng"></div><div class="fld"><input id="cfg-tm0" type="number" placeholder="0"></div></div>
+    <div class="row2"><div class="fld"><input id="cfg-tn1" placeholder="Bạc"></div><div class="fld"><input id="cfg-tm1" type="number" placeholder="200"></div></div>
+    <div class="row2"><div class="fld"><input id="cfg-tn2" placeholder="Vàng"></div><div class="fld"><input id="cfg-tm2" type="number" placeholder="500"></div></div>
+    <div class="row2"><div class="fld"><input id="cfg-tn3" placeholder="Kim Cương"></div><div class="fld"><input id="cfg-tm3" type="number" placeholder="1000"></div></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+    <button class="btn" onclick="saveCfgLoyalty()">Lưu cấu hình</button>
+    <button class="btn ghost" onclick="changeMgrPass()">Đổi mật khẩu quản lý</button>
+    <button class="btn ghost" onclick="closeCfg()">Đóng</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 let members = [];
@@ -166,7 +225,7 @@ function renderRows(){
       <td>${esc(m.name)||'<span class="muted">—</span>'}</td>
       <td class="num">${fmt(m.points)}</td>
       <td><span class="tier ${tierCls}">${esc(m.tier||'Đồng')}</span></td>
-      <td class="num">${m.stamps||0}/10</td>
+      <td class="num">${m.stamps||0}/${LOY.stampGoal||10}</td>
       <td class="muted">${dt(m.created_at)}</td>
       <td><div class="acts">
         <button class="btn ghost sm" onclick="adjust('${m.id}')">Cộng/Trừ</button>
@@ -219,13 +278,120 @@ async function history(id){
 function openModal(){ $('#scrim').classList.add('show'); $('#modal').classList.add('show'); }
 function closeModal(){ $('#scrim').classList.remove('show'); $('#modal').classList.remove('show'); }
 
+/* ================= LOGIC ĐIỂM (config) ================= */
+let LOY={vndPerPoint:1000,stampPerOrder:1,stampGoal:10,tiers:[]};
+async function loadLoyaltyCfg(){ try{ const r=await fetch(cfg().base+'/loyalty-admin'); const j=await r.json(); if(j.config) LOY=j.config; }catch(_){}
+  const el=$('#loy-hint'); if(el) el.textContent='Quét QR khách → nhập tiền đơn → tự cộng điểm ('+fmt(LOY.vndPerPoint)+'đ = 1 điểm).'; }
+
+/* ================= QUÉT QR + ACCRUE ================= */
+let scanStream=null, scanRAF=null, scanMember=null;
+function openScan(){ resetScan(); $('#scanScrim').classList.add('show'); $('#scanModal').classList.add('show'); startCam(); }
+function closeScan(){ stopCam(); $('#scanScrim').classList.remove('show'); $('#scanModal').classList.remove('show'); }
+function resetScan(){ $('#scan-cam').style.display='block'; $('#scan-form').style.display='none'; $('#scan-amount').value=''; $('#scan-order').value=''; $('#scan-preview').textContent=''; scanMember=null; $('#scan-msg').textContent='Chĩa camera vào mã QR của khách…'; }
+async function startCam(){
+  try{
+    scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const v=$('#scan-video'); v.srcObject=scanStream; await v.play(); scanLoop();
+  }catch(e){
+    $('#scan-msg').innerHTML='Không mở được camera. Nhập SĐT thủ công:<br><input id="scan-manual" placeholder="SĐT khách" style="margin-top:8px;max-width:220px"> <button class="btn sm" onclick="manualPhone()">Tiếp tục</button>';
+  }
+}
+function stopCam(){ if(scanRAF) cancelAnimationFrame(scanRAF); scanRAF=null; if(scanStream){ scanStream.getTracks().forEach(t=>t.stop()); scanStream=null; } }
+function parsePhone(data){ const s=String(data||'').trim(); let m=s.match(/BUNBUN\|(\d{8,12})/i); if(m) return '0'+m[1].replace(/^0+/,''); if(/^0?\d{8,11}$/.test(s)) return '0'+s.replace(/^0+/,''); return null; }
+function scanLoop(){
+  const v=$('#scan-video'), cv=$('#scan-canvas');
+  if(v.readyState===v.HAVE_ENOUGH_DATA && window.jsQR){
+    cv.width=v.videoWidth; cv.height=v.videoHeight;
+    const ctx=cv.getContext('2d'); ctx.drawImage(v,0,0,cv.width,cv.height);
+    const img=ctx.getImageData(0,0,cv.width,cv.height);
+    const code=jsQR(img.data,img.width,img.height);
+    if(code && code.data){ const phone=parsePhone(code.data); if(phone){ stopCam(); goAccrue(phone); return; } }
+  }
+  scanRAF=requestAnimationFrame(scanLoop);
+}
+function manualPhone(){ const p=($('#scan-manual')||{}).value||''; const phone=parsePhone(p); if(!phone){ toast('SĐT không hợp lệ', true); return; } stopCam(); goAccrue(phone); }
+async function findOrCreateMember(phone){
+  let j=await api('/members-admin?phone='+encodeURIComponent(phone));
+  let m=(j.members||[]).find(x=>x.phone===phone);
+  if(m) return m;
+  await fetch(cfg().base+'/crm-points',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'get',phone})});
+  j=await api('/members-admin?phone='+encodeURIComponent(phone));
+  m=(j.members||[]).find(x=>x.phone===phone);
+  if(!m) throw new Error('không tạo được hội viên');
+  return m;
+}
+async function goAccrue(phone){
+  $('#scan-msg').textContent='Đang tìm khách…';
+  try{
+    const m=await findOrCreateMember(phone); scanMember=m;
+    $('#scan-cam').style.display='none'; $('#scan-form').style.display='block';
+    $('#scan-phone').textContent=m.phone; $('#scan-name').textContent=m.name?('· '+m.name):'';
+    $('#scan-cur').textContent='Hiện có: '+fmt(m.points)+' điểm · '+(m.tier||'Đồng')+' · '+(m.stamps||0)+'/'+LOY.stampGoal+' tem';
+    $('#scan-amount').focus();
+  }catch(e){ toast('Lỗi: '+e.message, true); closeScan(); }
+}
+function scanPreview(){
+  const amt=parseInt($('#scan-amount').value,10)||0;
+  const pts=Math.floor(amt/(LOY.vndPerPoint||1000));
+  $('#scan-preview').textContent = amt>0 ? ('→ +'+pts+' điểm  ('+fmt(amt)+'đ ÷ '+fmt(LOY.vndPerPoint)+') · +'+LOY.stampPerOrder+' tem') : '';
+}
+async function scanAccrue(){
+  if(!scanMember) return;
+  const amt=parseInt($('#scan-amount').value,10)||0;
+  if(amt<=0){ toast('Nhập tổng tiền đơn', true); return; }
+  try{
+    const j=await api('/members-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'accrue',memberId:scanMember.id,amountVnd:amt,orderNo:$('#scan-order').value.trim()})});
+    toast('✓ +'+j.addedPoints+' điểm → '+fmt(j.points)+' điểm · '+j.tier+' · '+j.stamps+'/'+j.stampGoal+' tem');
+    closeScan(); loadMembers();
+  }catch(e){ toast('Lỗi: '+e.message, true); }
+}
+
+/* ================= CẤU HÌNH ĐIỂM (mật khẩu QUẢN LÝ) ================= */
+let _mgrPw=null;
+async function openCfg(){
+  const pw=prompt('Nhập MẬT KHẨU QUẢN LÝ để chỉnh logic điểm\n(khác mật khẩu nhân viên; khoá chủ .env cũng dùng được):');
+  if(pw===null) return;
+  try{
+    const r=await fetch(cfg().base+'/loyalty-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verifyManager',password:pw})});
+    const j=await r.json();
+    if(!j.ok){ toast('Sai mật khẩu quản lý', true); return; }
+    _mgrPw=pw;
+    const c=(await (await fetch(cfg().base+'/loyalty-admin')).json()).config;
+    $('#cfg-vpp').value=c.vndPerPoint; $('#cfg-spo').value=c.stampPerOrder; $('#cfg-goal').value=c.stampGoal;
+    for(let i=0;i<4;i++){ const t=(c.tiers||[])[i]||{n:'',min:0}; $('#cfg-tn'+i).value=t.n; $('#cfg-tm'+i).value=t.min; }
+    $('#cfgScrim').classList.add('show'); $('#cfgModal').classList.add('show');
+  }catch(e){ toast('Lỗi: '+e.message, true); }
+}
+function closeCfg(){ $('#cfgScrim').classList.remove('show'); $('#cfgModal').classList.remove('show'); _mgrPw=null; }
+async function saveCfgLoyalty(){
+  const config={
+    vndPerPoint:parseInt($('#cfg-vpp').value,10)||1000,
+    stampPerOrder:parseInt($('#cfg-spo').value,10)||0,
+    stampGoal:parseInt($('#cfg-goal').value,10)||10,
+    tiers:[0,1,2,3].map(i=>({n:($('#cfg-tn'+i).value||'').trim(),min:parseInt($('#cfg-tm'+i).value,10)||0})).filter(t=>t.n)
+  };
+  try{
+    const r=await fetch(cfg().base+'/loyalty-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'save',password:_mgrPw,config})});
+    const j=await r.json(); if(!r.ok) throw new Error(j.error||('HTTP '+r.status));
+    LOY=j.config; loadLoyaltyCfg(); toast('Đã lưu cấu hình điểm ✓'); closeCfg();
+  }catch(e){ toast('Lỗi: '+e.message, true); }
+}
+function changeMgrPass(){
+  const pw=prompt('Mật khẩu quản lý HIỆN TẠI (hoặc khoá chủ .env):'); if(pw===null) return;
+  const np=prompt('Mật khẩu quản lý MỚI (tối thiểu 4 ký tự):'); if(np===null) return;
+  if(np.length<4){ toast('Mật khẩu quá ngắn', true); return; }
+  fetch(cfg().base+'/loyalty-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'changeManager',oldPassword:pw,newPassword:np})})
+    .then(r=>r.json().then(j=>{ if(!r.ok) throw new Error(j.error||('HTTP '+r.status)); }))
+    .then(()=>toast('Đã đổi mật khẩu quản lý ✓')).catch(e=>toast('Lỗi: '+e.message, true));
+}
+
 restoreCfg();
 
 /* ---- Cổng đăng nhập: chặn cho tới khi nhập đúng mật khẩu (xác thực qua admin-auth) ---- */
 (function(){
   const base=(localStorage.getItem('bb_admin_base')||API_DEFAULT).replace(/\/$/,'');
   async function verify(pw){ try{ const r=await fetch(base+'/admin-auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',password:pw})}); const j=await r.json(); return !!j.ok; }catch(_){ return false; } }
-  function unlock(pw){ localStorage.setItem('bb_admin_base',base); localStorage.setItem('bb_admin_token',pw); document.getElementById('gate').style.display='none'; document.body.classList.remove('locked'); restoreCfg(); loadMembers(); }
+  function unlock(pw){ localStorage.setItem('bb_admin_base',base); localStorage.setItem('bb_admin_token',pw); document.getElementById('gate').style.display='none'; document.body.classList.remove('locked'); restoreCfg(); loadLoyaltyCfg(); loadMembers(); }
   async function submit(){ const pw=document.getElementById('gpw').value.trim(); const e=document.getElementById('gerr'); if(!pw){e.textContent='Nhập mật khẩu';return;} e.textContent='Đang kiểm tra…'; if(await verify(pw)) unlock(pw); else e.textContent='Sai mật khẩu, thử lại'; }
   document.body.classList.add('locked');
   document.getElementById('gbtn').addEventListener('click',submit);
