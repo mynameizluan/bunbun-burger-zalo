@@ -46,9 +46,28 @@ td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;}
 .modal h3{margin:0 0 10px;font-family:'Plus Jakarta Sans',sans-serif;}
 .tx{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px;}
 .tx .pos{color:var(--green);font-weight:600;} .tx .neg{color:var(--maroon);font-weight:600;}
+.gate{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(155deg,#FF7A45,#E24E17);}
+.gate .card{background:#fff;border-radius:20px;padding:30px 26px;width:344px;max-width:92vw;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.28);}
+.gate .lg{font-size:38px;line-height:1;}
+.gate h2{margin:10px 0 3px;font-size:20px;color:var(--ink);}
+.gate .p{margin:0;color:var(--soft);font-size:13px;}
+.gate input{width:100%;padding:13px 14px;margin:18px 0 12px;border:1px solid var(--line);border-radius:12px;font-size:15px;text-align:center;box-sizing:border-box;}
+.gate button{width:100%;padding:13px;border:none;border-radius:12px;background:var(--orange);color:#fff;font-size:15px;font-weight:600;cursor:pointer;}
+.gate .err{color:var(--maroon);font-size:13px;margin-top:10px;min-height:18px;}
+body.locked{overflow:hidden;}
 </style>
 </head>
 <body>
+<div class="gate" id="gate">
+  <div class="card">
+    <div class="lg">🍔</div>
+    <h2>Bunbun · Hội viên</h2>
+    <div class="p">Nhập mật khẩu để truy cập</div>
+    <input id="gpw" type="password" placeholder="Mật khẩu" autocomplete="current-password">
+    <button id="gbtn">Đăng nhập</button>
+    <div class="err" id="gerr"></div>
+  </div>
+</div>
 <div class="wrap">
   <h1>Bunbun Burger — Hội viên & điểm</h1>
   <div class="sub">Xem điểm/hạng/tem của khách, cộng-trừ điểm và xác nhận đổi quà ngay tại quầy. Không cần iPOS CRM.</div>
@@ -201,7 +220,20 @@ function openModal(){ $('#scrim').classList.add('show'); $('#modal').classList.a
 function closeModal(){ $('#scrim').classList.remove('show'); $('#modal').classList.remove('show'); }
 
 restoreCfg();
-if(cfg().base && cfg().token) loadMembers();
+
+/* ---- Cổng đăng nhập: chặn cho tới khi nhập đúng mật khẩu (xác thực qua admin-auth) ---- */
+(function(){
+  const base=(localStorage.getItem('bb_admin_base')||API_DEFAULT).replace(/\/$/,'');
+  async function verify(pw){ try{ const r=await fetch(base+'/admin-auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',password:pw})}); const j=await r.json(); return !!j.ok; }catch(_){ return false; } }
+  function unlock(pw){ localStorage.setItem('bb_admin_base',base); localStorage.setItem('bb_admin_token',pw); document.getElementById('gate').style.display='none'; document.body.classList.remove('locked'); restoreCfg(); loadMembers(); }
+  async function submit(){ const pw=document.getElementById('gpw').value.trim(); const e=document.getElementById('gerr'); if(!pw){e.textContent='Nhập mật khẩu';return;} e.textContent='Đang kiểm tra…'; if(await verify(pw)) unlock(pw); else e.textContent='Sai mật khẩu, thử lại'; }
+  document.body.classList.add('locked');
+  document.getElementById('gbtn').addEventListener('click',submit);
+  document.getElementById('gpw').addEventListener('keydown',e=>{ if(e.key==='Enter') submit(); });
+  const saved=localStorage.getItem('bb_admin_token');
+  if(saved) verify(saved).then(ok=>{ if(ok) unlock(saved); else document.getElementById('gpw').focus(); });
+  else document.getElementById('gpw').focus();
+})();
 </script>
 </body>
 </html>
